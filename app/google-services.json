@@ -1,14 +1,14 @@
 {
   "project_info": {
-    "project_number": "871055368994",
-    "firebase_url": "https://movieapp1-6cdd7-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "movieapp1-6cdd7",
-    "storage_bucket": "movieapp1-6cdd7.firebasestorage.app"
+    "project_number": "392026934472",
+    "firebase_url": "https://movie-app2-c71f4-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "movie-app2-c71f4",
+    "storage_bucket": "movie-app2-c71f4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:871055368994:android:3b9a5126823ca0ded03b7b",
+        "mobilesdk_app_id": "1:392026934472:android:05bfe6b58efc2fe701e9fd",
         "android_client_info": {
           "package_name": "com.example.temp"
         }
@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCvlY6wZD4vFE7sO1iUsNsTZ_Xyl90FkJY"
+          "current_key": "AIzaSyAeQbLCcbwNmtkzbeNykT7SSnv7uWnaIQk"
         }
       ],
       "services": {
