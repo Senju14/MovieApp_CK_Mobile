@@ -12,12 +12,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.temp.Adapters.FilmListAdapter;
 import com.example.temp.Adapters.SlidersAdapter;
+import com.example.temp.Domains.Film;
 import com.example.temp.Domains.SliderItems;
 import com.example.temp.R;
 import com.example.temp.databinding.ActivityMainBinding;
@@ -31,10 +34,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    RecyclerView.Adapter adapterNewMovies;
     ActivityMainBinding binding;
     private FirebaseDatabase database;
     private Handler sliderHandler = new Handler();
-    private Runnable sliderRunnable=new Runnable() {
+    private Runnable sliderRunnable = new Runnable() {
         @Override
         public void run() {
             binding.viewPager2.setCurrentItem( binding.viewPager2.getCurrentItem()+1 );
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         initBanner();
+        initTopMoving();
+        initUpComming();
 
         ViewCompat.setOnApplyWindowInsetsListener( findViewById( R.id.main ), (v, insets) -> {
             Insets systemBars = insets.getInsets( WindowInsetsCompat.Type.systemBars() );
@@ -64,10 +70,64 @@ public class MainActivity extends AppCompatActivity {
         } );
     }
 
+    private void initUpComming() {
+        DatabaseReference myRef = database.getReference( "Upcomming" );
+        binding.progressBarUpcoming.setVisibility( View.VISIBLE );
+        ArrayList<Film> items = new ArrayList<>();
+        myRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    for (DataSnapshot issue : snapshot.getChildren()) {
+                        items.add( issue.getValue(Film.class ) );
+                    }
+                    if (!items.isEmpty()) {
+                        binding.recyclerViewUpcoming.setLayoutManager(new LinearLayoutManager(MainActivity.this,
+                                LinearLayoutManager.HORIZONTAL, false));
+                        binding.recyclerViewUpcoming.setAdapter(new FilmListAdapter(items));
+                    }
+                    binding.progressBarUpcoming.setVisibility( View.GONE );
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        } );
+    }
+
+    private void initTopMoving() {
+        DatabaseReference myRef = database.getReference( "Items" );
+        binding.progressBarTop.setVisibility( View.VISIBLE );
+        ArrayList<Film> items = new ArrayList<>();
+        myRef.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    for (DataSnapshot issue : snapshot.getChildren()) {
+                        items.add( issue.getValue(Film.class ) );
+                    }
+                    if (!items.isEmpty()) {
+                        binding.recyclerViewTopMovies.setLayoutManager(new LinearLayoutManager(MainActivity.this,
+                                LinearLayoutManager.HORIZONTAL, false));
+                        binding.recyclerViewTopMovies.setAdapter(new FilmListAdapter(items));
+                    }
+                    binding.progressBarTop.setVisibility( View.GONE );
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        } );
+    }
+
     private void initBanner() {
         DatabaseReference myRef = database.getReference( "Banners" );
         binding.progressBarBanner.setVisibility( View.VISIBLE );
-        ArrayList<SliderItems> items=new ArrayList<>();
+        ArrayList<SliderItems> items = new ArrayList<>();
         myRef.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
