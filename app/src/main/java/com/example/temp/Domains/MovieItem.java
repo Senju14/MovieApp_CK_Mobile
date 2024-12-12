@@ -6,8 +6,16 @@ public class MovieItem {
     private String Title;
     private List<String> Genre;
     private List<Cast> Casts;
-    // Các getter và setter
 
+    private String Poster;
+
+
+    // Các getter và setter
+    public String getPoster() { return Poster; }
+    public void setPoster(String poster) { Poster = poster; }
+
+
+    // Các getter và setter
     public String getTitle() { return Title; }
     public void setTitle(String title) { Title = title; }
 

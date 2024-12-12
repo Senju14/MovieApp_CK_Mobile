@@ -45,6 +45,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             holder.genreTextView.setText(String.join(", ", movie.getGenre()));
         }
 
+        // Tải poster phim bằng Glide
+        if (movie.getPoster() != null && !movie.getPoster().isEmpty()) {
+            Glide.with(context)
+                    .load(movie.getPoster())
+                    .into(holder.posterImageView);
+        }
     }
 
     @Override
