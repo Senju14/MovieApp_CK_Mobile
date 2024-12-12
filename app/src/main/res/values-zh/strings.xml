@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">电影应用</string>
+    <string name="get_started">开始</string>
+    <string name="watch_premium">观看高级内容，数百部电视节目和电影正在您的手机上等待</string>
+    <string name="choose_language">选择语言</string>
+</resources>

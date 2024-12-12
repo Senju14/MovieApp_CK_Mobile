@@ -75,6 +75,26 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        binding.imageView7.setOnClickListener(v -> {
+            if (item != null) {
+                // Tạo nội dung để chia sẻ
+                String shareContent = "Check out this movie:\n" +
+                        "Title: " + item.getTitle() + "\n" +
+                        "Year: " + item.getYear() + "\n" +
+                        "IMDB Rating: " + item.getImdb() + "\n" +
+                        "Description: " + item.getDescription() + "\n" +
+                        "Trailer: " + item.getTrailer();
+
+                // Intent chia sẻ
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareContent);
+
+                // Hiển thị giao diện chia sẻ
+                startActivity(Intent.createChooser(shareIntent, "Share movie details via"));
+            }
+        });
+
         binding.backImg.setOnClickListener(v -> finish());
 
         float radius = 10f;

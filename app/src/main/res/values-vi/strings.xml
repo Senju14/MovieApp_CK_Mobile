@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Phim Chiếu Rạp</string>
+    <string name="get_started">Bắt đầu</string>
+    <string name="watch_premium">Xem hàng trăm chương trình TV và phim cao cấp đang chờ bạn ngay trên điện thoại</string>
+    <string name="choose_language">Chọn ngôn ngữ</string>
+
+</resources>

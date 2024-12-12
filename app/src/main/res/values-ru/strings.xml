@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Приложение Фильмов</string>
+    <string name="get_started">Начать</string>
+    <string name="watch_premium">Смотрите Премиум Сотни телешоу и фильмов ждут вас прямо на телефоне</string>
+    <string name="choose_language">Выбрать язык</string>
+</resources>

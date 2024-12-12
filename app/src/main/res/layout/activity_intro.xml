@@ -46,7 +46,7 @@
                 android:textAlignment="center"
                 android:textSize="20sp"
                 android:layout_margin="32dp"
-                android:text="Watch Premium Hundreds of TV Shows and Movie are Waiting for you right on the phone" />
+                android:text="@string/watch_premium" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/startBtn"
@@ -57,7 +57,21 @@
                 android:textSize="18sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Get Started" />
+                android:text="@string/get_started" />
         </LinearLayout>
     </ScrollView>
+
+    <!-- Add Language Switch Icon -->
+    <ImageView
+        android:id="@+id/langSwitchIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_language"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

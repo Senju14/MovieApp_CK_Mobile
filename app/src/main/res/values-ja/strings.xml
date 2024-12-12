@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">映画アプリ</string>
+    <string name="get_started">始める</string>
+    <string name="watch_premium">プレミアムを視聴する、何百ものテレビ番組や映画があなたの電話で待っています</string>
+    <string name="choose_language">言語を選択</string>
+</resources>

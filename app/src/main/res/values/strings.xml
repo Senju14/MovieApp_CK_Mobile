@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">temp</string>
+    <string name="app_name">Movie App</string>
+    <string name="get_started">Get Started</string>
+    <string name="watch_premium">Watch Premium Hundreds of TV Shows and Movie are Waiting for you right on the phone</string>
+    <string name="choose_language">Choose Language</string>
+
 </resources>
