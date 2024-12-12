@@ -6,9 +6,13 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -24,8 +28,11 @@ import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.temp.Adapters.FilmListAdapter;
+import com.example.temp.Adapters.MovieAdapter;
 import com.example.temp.Adapters.SlidersAdapter;
+import com.example.temp.Domains.Cast;
 import com.example.temp.Domains.Film;
+import com.example.temp.Domains.MovieItem;
 import com.example.temp.Domains.SliderItems;
 import com.example.temp.R;
 import com.example.temp.databinding.ActivityMainBinding;
@@ -37,9 +44,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    private EditText searchEditText;
+    private RecyclerView searchResultRecyclerView;
+    private List<MovieItem> movieList = new ArrayList<>();
+    private List<MovieItem> searchResultList = new ArrayList<>();
+    private MovieAdapter searchAdapter;
+
+
     RecyclerView.Adapter adapterNewMovies;
     ActivityMainBinding binding;
     private FirebaseDatabase database;
@@ -81,6 +98,114 @@ public class MainActivity extends AppCompatActivity {
         // Thiết lập chức năng cho nút chuyển đổi ngôn ngữ
         binding.langSwitchIcon.setOnClickListener(v -> showLanguageDialog());
 
+
+        // Ánh xạ EditText tìm kiếm
+        searchEditText = findViewById(R.id.editTextText);
+        searchResultRecyclerView = findViewById(R.id.searchResultRecyclerView); // Bạn cần thêm RecyclerView này vào layout
+
+        // Khởi tạo adapter cho kết quả tìm kiếm
+        searchAdapter = new MovieAdapter(this, searchResultList);
+        searchResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        searchResultRecyclerView.setAdapter(searchAdapter);
+
+        // Thiết lập sự kiện tìm kiếm
+        setupSearchFunction();
+
+        // Tải dữ liệu phim từ Firebase
+        loadMoviesFromFirebase();
+
+
+    }
+
+    private void setupSearchFunction() {
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                performSearch(s.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void loadMoviesFromFirebase() {
+        DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("Items");
+        DatabaseReference upcommingRef = FirebaseDatabase.getInstance().getReference("Upcomming");
+
+        // Tải phim từ "Items"
+        itemsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MovieItem movie = dataSnapshot.getValue(MovieItem.class);
+                    if (movie != null) {
+                        movieList.add(movie);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Tải phim từ "Upcomming"
+        upcommingRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MovieItem movie = dataSnapshot.getValue(MovieItem.class);
+                    if (movie != null) {
+                        movieList.add(movie);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void performSearch(String searchText) {
+        searchResultList.clear();
+
+        for (MovieItem movie : movieList) {
+            // Tìm kiếm theo tiêu đề phim
+            if (movie.getTitle() != null && movie.getTitle().toLowerCase().contains( searchText )) {
+                searchResultList.add( movie );
+                continue;
+            }
+
+            // Tìm kiếm theo diễn viên
+            if (movie.getCasts() != null) {
+                for (Cast cast : movie.getCasts()) {
+                    if (cast.getActor() != null && cast.getActor().toLowerCase().contains( searchText )) {
+                        searchResultList.add( movie );
+                        break;
+                    }
+                }
+            }
+
+            // Tìm kiếm theo thể loại
+            if (movie.getGenre() != null) {
+                for (String genre : movie.getGenre()) {
+                    if (genre.toLowerCase().contains( searchText )) {
+                        searchResultList.add( movie );
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Cập nhật giao diện
+        searchAdapter.notifyDataSetChanged();
     }
 
     private void showLanguageDialog() {
