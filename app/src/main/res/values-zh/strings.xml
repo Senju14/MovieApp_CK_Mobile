@@ -4,4 +4,14 @@
     <string name="get_started">开始</string>
     <string name="watch_premium">观看高级内容，数百部电视节目和电影正在您的手机上等待</string>
     <string name="choose_language">选择语言</string>
+
+    <string name="hello">你好</string>
+    <string name="search_movie">搜索电影</string>
+    <string name="top_movie">顶级电影</string>
+    <string name="see_all">查看全部</string>
+    <string name="upcoming_movies">即将上映的电影</string>
+
+    <string name="watch_now">立即观看</string>
+    <string name="movie_summary">摘要</string>
+    <string name="cast">演员阵容</string>
 </resources>

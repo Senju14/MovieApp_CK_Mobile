@@ -4,4 +4,13 @@
     <string name="watch_premium">Watch Premium Hundreds of TV Shows and Movie are Waiting for you right on the phone</string>
     <string name="choose_language">Choose Language</string>
 
+    <string name="hello">Hello</string>
+    <string name="search_movie">Search Movie</string>
+    <string name="top_movie">Top Movie</string>
+    <string name="see_all">See all</string>
+    <string name="upcoming_movies">Upcoming Movies</string>
+
+    <string name="watch_now">Watch now</string>
+    <string name="movie_summary">Summary</string>
+    <string name="cast">Cast</string>
 </resources>

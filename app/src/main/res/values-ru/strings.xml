@@ -4,4 +4,14 @@
     <string name="get_started">Начать</string>
     <string name="watch_premium">Смотрите Премиум Сотни телешоу и фильмов ждут вас прямо на телефоне</string>
     <string name="choose_language">Выбрать язык</string>
+
+    <string name="hello">Привет</string>
+    <string name="search_movie">поиск фильма</string>
+    <string name="top_movie">лучший фильм</string>
+    <string name="see_all">увидеть все</string>
+    <string name="upcoming_movies">Предстоящие фильмы</string>
+
+    <string name="watch_now">Смотреть сейчас</string>
+    <string name="movie_summary">Краткое описание</string>
+    <string name="cast">Актерский состав</string>
 </resources>

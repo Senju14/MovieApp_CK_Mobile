@@ -42,8 +42,6 @@ public class IntroActivity extends AppCompatActivity {
         EdgeToEdge.enable( this );
         setContentView( binding.getRoot() );
 
-        // Load ngôn ngữ đã lưu nhưng không áp dụng lại nếu không cần thiết
-        applySavedLocale();
 
         Window w=getWindow();
         w.setFlags( WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,

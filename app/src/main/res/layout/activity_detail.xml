@@ -143,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:layout_weight="1"
-                        android:text="Summery"
+                        android:text="@string/movie_summary"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
@@ -161,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:layout_weight="1"
-                        android:text="Cast"
+                        android:text="@string/cast"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
@@ -186,7 +186,7 @@
                 android:drawableEnd="@drawable/play_circle"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="Watch now"
+                android:text="@string/watch_now"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -196,4 +196,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/blurView2" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Add Language Switch Icon -->
+    <ImageView
+        android:id="@+id/langSwitchIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_language"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

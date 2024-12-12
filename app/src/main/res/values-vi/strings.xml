@@ -5,4 +5,13 @@
     <string name="watch_premium">Xem hàng trăm chương trình TV và phim cao cấp đang chờ bạn ngay trên điện thoại</string>
     <string name="choose_language">Chọn ngôn ngữ</string>
 
+    <string name="hello">Xin Chào</string>
+    <string name="search_movie">Tìm kiếm phim</string>
+    <string name="top_movie">Phim hay nhất</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="upcoming_movies">Phim sắp ra mắt</string>
+
+    <string name="watch_now">Xem ngay</string>
+    <string name="movie_summary">Tóm tắt</string>
+    <string name="cast">Diễn viên</string>
 </resources>

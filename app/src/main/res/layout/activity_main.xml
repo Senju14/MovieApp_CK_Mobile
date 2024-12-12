@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="96dp"
                     android:layout_marginTop="4dp"
-                    android:text="Hello Huy"
+                    android:text="@string/hello"
                     android:textColor="@color/white"
                     android:textSize="19sp"
                     android:textStyle="bold"
@@ -75,7 +75,7 @@
                 android:drawableEnd="@drawable/microphone"
                 android:drawablePadding="8dp"
                 android:ems="10"
-                android:hint="Search Movies"
+                android:hint="@string/search_movie"
                 android:inputType="text"
                 android:padding="12dp"
                 android:textColor="@color/white"
@@ -123,7 +123,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
 
-                    android:text="Top Movies"
+                    android:text="@string/top_movie"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -132,7 +132,7 @@
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="See all"
+                    android:text="@string/see_all"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -178,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
 
-                    android:text="Upcoming Movies"
+                    android:text="@string/upcoming_movies"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -187,7 +187,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="See all"
+                    android:text="@string/see_all"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -216,25 +216,39 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/recyclerViewUpcoming" />
+
+                <com.ismaeldivita.chipnavigation.ChipNavigationBar
+                    android:id="@+id/bottomNavigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="@drawable/dark_blue"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:cnb_iconColor="@color/white"
+                    app:cnb_iconSize="20dp"
+                    app:cnb_menuResource="@menu/bottom_menu"
+                    app:cnb_orientationMode="horizontal"
+                    app:cnb_radius="10dp"
+                    app:cnb_unselectedColor="@color/white"
+                    tools:layout_editor_absoluteX="9dp"
+                    tools:layout_editor_absoluteY="36dp" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>
 
-    <com.ismaeldivita.chipnavigation.ChipNavigationBar
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginStart="8dp"
+    <!-- Add Language Switch Icon -->
+    <ImageView
+        android:id="@+id/langSwitchIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/dark_blue"
-        app:cnb_menuResource="@menu/bottom_menu"
-        android:padding="4dp"
-        app:cnb_iconSize="20dp"
-        app:cnb_iconColor="@color/white"
-        app:cnb_radius="10dp"
-        app:cnb_unselectedColor="@color/white"
-        app:cnb_orientationMode="horizontal"
-        app:layout_constraintBottom_toBottomOf="@+id/scrollView2"
+        android:src="@drawable/ic_language"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
