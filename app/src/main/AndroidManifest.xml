@@ -13,14 +13,33 @@
         android:theme="@style/Theme.Temp"
         tools:targetApi="31">
         <activity
+<<<<<<< HEAD
             android:name=".Activities.SeatListActivity"
             android:exported="false" />
         <activity
+=======
+            android:name=".Activities.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.SignupActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+>>>>>>> d10928a6067c01bbec7a65147645a36c5f128f7c
             android:name=".Activities.DetailActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.MainActivity"
+<<<<<<< HEAD
             android:exported="true"></activity>
+=======
+            android:exported="false" />
+>>>>>>> d10928a6067c01bbec7a65147645a36c5f128f7c
         <activity
             android:name=".Activities.IntroActivity"
             android:exported="true">
