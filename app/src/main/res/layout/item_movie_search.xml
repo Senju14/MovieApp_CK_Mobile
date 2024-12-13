@@ -30,5 +30,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/movieActorsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/movieDescriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>

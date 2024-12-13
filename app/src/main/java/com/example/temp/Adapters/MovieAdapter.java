@@ -15,6 +15,8 @@ import com.example.temp.Domains.MovieItem;
 import com.example.temp.R;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import com.example.temp.Domains.Cast;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
     private Context context;
@@ -45,6 +47,21 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             holder.genreTextView.setText(String.join(", ", movie.getGenre()));
         }
 
+        // Hiển thị diễn viên
+        if (movie.getCasts() != null && !movie.getCasts().isEmpty()) {
+            List<String> actorNames = movie.getCasts().stream()
+                    .map(Cast::getActor)
+                    .collect( Collectors.toList());
+            holder.actorsTextView.setText(String.join(", ", actorNames));
+        }
+
+        // Hiển thị mô tả (Description)
+        if (movie.getDescription() != null && !movie.getDescription().isEmpty()) {
+            holder.descriptionTextView.setText(movie.getDescription());
+        } else {
+            holder.descriptionTextView.setText("No description available.");
+        }
+
         // Tải poster phim bằng Glide
         if (movie.getPoster() != null && !movie.getPoster().isEmpty()) {
             Glide.with(context)
@@ -64,6 +81,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         ImageView posterImageView;
         TextView titleTextView;
         TextView genreTextView;
+        TextView actorsTextView;
+        TextView descriptionTextView;
+
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,6 +92,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             posterImageView = itemView.findViewById(R.id.moviePosterImageView);
             titleTextView = itemView.findViewById(R.id.movieTitleTextView);
             genreTextView = itemView.findViewById(R.id.movieGenreTextView);
+            actorsTextView = itemView.findViewById(R.id.movieActorsTextView);
+            descriptionTextView = itemView.findViewById(R.id.movieDescriptionTextView);
         }
     }
 }

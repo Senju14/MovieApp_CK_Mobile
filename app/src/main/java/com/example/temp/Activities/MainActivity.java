@@ -176,36 +176,54 @@ public class MainActivity extends AppCompatActivity {
     private void performSearch(String searchText) {
         searchResultList.clear();
 
+
+        if (searchText.isEmpty()) {
+            // Nếu không có từ khóa, hiển thị danh sách gợi ý hoặc trống
+            searchResultRecyclerView.setVisibility(View.GONE);
+            return;
+        }
+
         for (MovieItem movie : movieList) {
+            boolean matched = false;
+
             // Tìm kiếm theo tiêu đề phim
-            if (movie.getTitle() != null && movie.getTitle().toLowerCase().contains( searchText )) {
-                searchResultList.add( movie );
-                continue;
+            if (movie.getTitle() != null &&
+                    movie.getTitle().toLowerCase().contains(searchText)) {
+                matched = true;
             }
 
             // Tìm kiếm theo diễn viên
-            if (movie.getCasts() != null) {
+            if (!matched && movie.getCasts() != null) {
                 for (Cast cast : movie.getCasts()) {
-                    if (cast.getActor() != null && cast.getActor().toLowerCase().contains( searchText )) {
-                        searchResultList.add( movie );
+                    if (cast.getActor() != null &&
+                            cast.getActor().toLowerCase().contains(searchText)) {
+                        matched = true;
                         break;
                     }
                 }
             }
 
             // Tìm kiếm theo thể loại
-            if (movie.getGenre() != null) {
+            if (!matched && movie.getGenre() != null) {
                 for (String genre : movie.getGenre()) {
-                    if (genre.toLowerCase().contains( searchText )) {
-                        searchResultList.add( movie );
+                    if (genre.toLowerCase().contains(searchText)) {
+                        matched = true;
                         break;
                     }
                 }
+            }
+
+            // Nếu tìm thấy, thêm vào danh sách kết quả
+            if (matched) {
+                searchResultList.add(movie);
             }
         }
 
         // Cập nhật giao diện
         searchAdapter.notifyDataSetChanged();
+        searchResultRecyclerView.setVisibility(
+                searchResultList.isEmpty() ? View.GONE : View.VISIBLE
+        );
     }
 
     private void showLanguageDialog() {

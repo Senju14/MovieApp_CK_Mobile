@@ -9,8 +9,20 @@ public class MovieItem {
 
     private String Poster;
 
+    private String Description;
+
 
     // Các getter và setter
+
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String description) {
+        Description = description;
+    }
+
     public String getPoster() { return Poster; }
     public void setPoster(String poster) { Poster = poster; }
 
