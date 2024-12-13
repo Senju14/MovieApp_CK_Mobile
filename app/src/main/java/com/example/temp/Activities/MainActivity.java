@@ -8,10 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -37,6 +39,8 @@ import com.example.temp.Domains.SliderItems;
 import com.example.temp.R;
 import com.example.temp.databinding.ActivityMainBinding;
 import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -95,28 +99,60 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         } );
 
-        // Thiết lập chức năng cho nút chuyển đổi ngôn ngữ
         binding.langSwitchIcon.setOnClickListener(v -> showLanguageDialog());
 
 
-        // Ánh xạ EditText tìm kiếm
         searchEditText = findViewById(R.id.editTextText);
         searchResultRecyclerView = findViewById(R.id.searchResultRecyclerView); // Bạn cần thêm RecyclerView này vào layout
 
-        // Khởi tạo adapter cho kết quả tìm kiếm
         searchAdapter = new MovieAdapter(this, searchResultList);
         searchResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         searchResultRecyclerView.setAdapter(searchAdapter);
 
-        // Thiết lập sự kiện tìm kiếm
         setupSearchFunction();
 
-        // Tải dữ liệu phim từ Firebase
         loadMoviesFromFirebase();
 
+        displayUserInfo();
 
     }
 
+    private void displayUserInfo() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        String uid = currentUser.getUid();
+        DatabaseReference userRef = database.getReference("users").child(uid);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String name = snapshot.child("name").getValue(String.class);
+                    String email = snapshot.child("email").getValue(String.class);
+                    updateUserInfoUI(name, email);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("DatabaseError", error.getMessage());
+            }
+        });
+    }
+
+    private void updateUserInfoUI(String name, String email) {
+
+        TextView nameTextView = findViewById(R.id.txtName);
+        TextView emailTextView = findViewById(R.id.txtGmail);
+
+        nameTextView.setText(name);
+        emailTextView.setText(email);
+    }
     private void setupSearchFunction() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -177,13 +213,11 @@ public class MainActivity extends AppCompatActivity {
         searchResultList.clear();
 
         for (MovieItem movie : movieList) {
-            // Tìm kiếm theo tiêu đề phim
             if (movie.getTitle() != null && movie.getTitle().toLowerCase().contains( searchText )) {
                 searchResultList.add( movie );
                 continue;
             }
 
-            // Tìm kiếm theo diễn viên
             if (movie.getCasts() != null) {
                 for (Cast cast : movie.getCasts()) {
                     if (cast.getActor() != null && cast.getActor().toLowerCase().contains( searchText )) {
@@ -193,7 +227,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            // Tìm kiếm theo thể loại
             if (movie.getGenre() != null) {
                 for (String genre : movie.getGenre()) {
                     if (genre.toLowerCase().contains( searchText )) {
@@ -203,8 +236,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
-        // Cập nhật giao diện
         searchAdapter.notifyDataSetChanged();
     }
 
@@ -383,4 +414,16 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         sliderHandler.postDelayed( sliderRunnable, 2000 );
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
 }
