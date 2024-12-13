@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -52,6 +53,16 @@ public class IntroActivity extends AppCompatActivity {
             v.setPadding( systemBars.left, systemBars.top, systemBars.right, systemBars.bottom );
             return insets;
         } );
+
+        // Chuyển sang LoginActivity sau một khoảng thời gian hoặc sau khi thực hiện một số logic
+        new Handler().postDelayed( new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(IntroActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish(); // Đóng IntroActivity để không thể quay lại
+            }
+        }, 2000);
 
         // Thiết lập chức năng cho nút chuyển đổi ngôn ngữ
         binding.langSwitchIcon.setOnClickListener(v -> showLanguageDialog());

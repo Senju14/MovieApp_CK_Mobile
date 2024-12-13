@@ -55,4 +55,8 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.15.1")  // Thêm Glide nếu chưa có
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
+
+    implementation ("com.google.firebase:firebase-auth:22.3.1")
+    implementation ("com.google.firebase:firebase-database:21.0.0")
+    implementation ("com.google.android.gms:play-services-auth:21.0.0")
 }

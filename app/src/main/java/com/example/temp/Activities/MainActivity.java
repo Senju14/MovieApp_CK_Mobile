@@ -212,33 +212,23 @@ public class MainActivity extends AppCompatActivity {
     private void performSearch(String searchText) {
         searchResultList.clear();
 
-
         if (searchText.isEmpty()) {
-            // Nếu không có từ khóa, hiển thị danh sách gợi ý hoặc trống
+            // If no search text, hide the search results
             searchResultRecyclerView.setVisibility(View.GONE);
             return;
         }
 
         for (MovieItem movie : movieList) {
-<<<<<<< HEAD
             boolean matched = false;
 
-            // Tìm kiếm theo tiêu đề phim
+            // Search by movie title
             if (movie.getTitle() != null &&
                     movie.getTitle().toLowerCase().contains(searchText)) {
                 matched = true;
             }
 
-            // Tìm kiếm theo diễn viên
+            // Search by cast
             if (!matched && movie.getCasts() != null) {
-=======
-            if (movie.getTitle() != null && movie.getTitle().toLowerCase().contains( searchText )) {
-                searchResultList.add( movie );
-                continue;
-            }
-
-            if (movie.getCasts() != null) {
->>>>>>> d10928a6067c01bbec7a65147645a36c5f128f7c
                 for (Cast cast : movie.getCasts()) {
                     if (cast.getActor() != null &&
                             cast.getActor().toLowerCase().contains(searchText)) {
@@ -248,12 +238,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-<<<<<<< HEAD
-            // Tìm kiếm theo thể loại
+            // Search by genre
             if (!matched && movie.getGenre() != null) {
-=======
-            if (movie.getGenre() != null) {
->>>>>>> d10928a6067c01bbec7a65147645a36c5f128f7c
                 for (String genre : movie.getGenre()) {
                     if (genre.toLowerCase().contains(searchText)) {
                         matched = true;
@@ -262,11 +248,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            // Nếu tìm thấy, thêm vào danh sách kết quả
+            // If a match is found, add to search results
             if (matched) {
                 searchResultList.add(movie);
             }
         }
+
+        // Update adapter and visibility
         searchAdapter.notifyDataSetChanged();
         searchResultRecyclerView.setVisibility(
                 searchResultList.isEmpty() ? View.GONE : View.VISIBLE
