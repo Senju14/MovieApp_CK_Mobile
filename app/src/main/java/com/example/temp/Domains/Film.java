@@ -13,7 +13,18 @@ public class Film implements Serializable {
     private int Year;
     private ArrayList<String> Genre;
     private ArrayList<Cast> Casts;
+
+    private double price = 10.0;
+
     public Film() {
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public String getTitle() {

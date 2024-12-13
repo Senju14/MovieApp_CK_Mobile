@@ -151,6 +151,12 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        binding.buyTicketBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SeatListActivity.class);
+            intent.putExtra("film", item);
+            startActivity(intent);
+        });
+
         binding.imageView7.setOnClickListener(v -> {
             if (item != null) {
                 // Tạo nội dung để chia sẻ

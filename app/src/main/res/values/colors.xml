@@ -5,4 +5,9 @@
     <color name="main_color">#252B45</color>
     <color name="dark_blue">#414863</color>
     <color name="red">#D74342</color>
+    <color name="orange">#FFCC80 </color>
+    <color name="orange_bg">#FF8C00</color>
+    <color name="gray">#808080</color>
+    <color name="light_black_bg">#333333</color>
+    <color name="white_bg">#ecedef</color>
 </resources>
