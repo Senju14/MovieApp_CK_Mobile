@@ -12,6 +12,19 @@
     <string name="upcoming_movies">Предстоящие фильмы</string>
 
     <string name="watch_now">Смотреть сейчас</string>
+    <string name="buy_ticket">Купить билеты</string>
     <string name="movie_summary">Краткое описание</string>
     <string name="cast">Актерский состав</string>
+
+    <string name="name">Имя</string>
+    <string name="username">Имя пользователя</string>
+    <string name="film_name">Название фильма</string>
+    <string name="date">Дата</string>
+    <string name="time">Время</string>
+    <string name="seats">Сиденья</string>
+    <string name="price">Цена</string>
+    <string name="discount">Скидка</string>
+
+    <string name="back">Назад</string>
+    <string name="Continue">Продолжать</string>
 </resources>

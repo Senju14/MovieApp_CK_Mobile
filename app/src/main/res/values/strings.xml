@@ -11,6 +11,19 @@
     <string name="upcoming_movies">Upcoming Movies</string>
 
     <string name="watch_now">Watch now</string>
+    <string name="buy_ticket">Buy Ticket</string>
     <string name="movie_summary">Summary</string>
     <string name="cast">Cast</string>
+
+    <string name="name">Name</string>
+    <string name="username">Usernam</string>
+    <string name="film_name">Film Name</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="seats">Seats</string>
+    <string name="price">Price</string>
+    <string name="discount">Discount</string>
+
+    <string name="back">Back</string>
+    <string name="Continue">Continue</string>
 </resources>

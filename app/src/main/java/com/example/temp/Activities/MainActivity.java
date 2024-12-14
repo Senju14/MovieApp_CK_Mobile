@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         displayUserInfo();
 
+
     }
 
     private void displayUserInfo() {

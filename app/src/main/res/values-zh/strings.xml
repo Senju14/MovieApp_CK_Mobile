@@ -12,6 +12,19 @@
     <string name="upcoming_movies">即将上映的电影</string>
 
     <string name="watch_now">立即观看</string>
+    <string name="buy_ticket">买票</string>
     <string name="movie_summary">摘要</string>
     <string name="cast">演员阵容</string>
+
+    <string name="name">姓名</string>
+    <string name="username">用户名</string>
+    <string name="film_name">影片名称</string>
+    <string name="date">日期</string>
+    <string name="time">时间</string>
+    <string name="seats">座位数</string>
+    <string name="price">价格</string>
+    <string name="discount">折扣</string>
+
+    <string name="back">后退</string>
+    <string name="Continue">继续</string>
 </resources>

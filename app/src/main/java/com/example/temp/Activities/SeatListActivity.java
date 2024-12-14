@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -14,8 +15,9 @@ import com.example.temp.Adapters.TimeAdapter;
 import com.example.temp.Adapters.DateAdapter;
 import com.example.temp.Domains.Film;
 import com.example.temp.Domains.Seat;
-import com.example.temp.R;
 import com.example.temp.databinding.ActivitySeatListBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -29,6 +31,12 @@ public class SeatListActivity extends AppCompatActivity {
     private Film film;
     private double price = 0.0;
     private int number = 0;
+
+    private ArrayList<String> selectedSeats = new ArrayList<>();
+    private double discount = 0.0;
+    private String filmName;
+    private String selectedDate;
+    private String selectedTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,13 +56,49 @@ public class SeatListActivity extends AppCompatActivity {
         Window w = getWindow();
         w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        // Handle "Continue" button
+        binding.button2.setOnClickListener(v -> {
+            proceedToConfirmation();
+        });
+    }
+
+    private void proceedToConfirmation() {
+        // Check if seats are selected
+        if (selectedSeats.isEmpty()) {
+            Toast.makeText(this, "Please select seats", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Get current user
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Prepare data to pass to Confirmation Activity
+        String name = currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User";
+        String username = currentUser.getEmail() != null ? currentUser.getEmail() : "Unknown";
+
+        // Create intent and pass data
+        Intent intent = new Intent(SeatListActivity.this, ConfirmationActivity.class);
+        intent.putExtra("name", name);
+        intent.putExtra("username", username);
+        intent.putExtra("filmName", filmName);
+        intent.putExtra("selectedDate", selectedDate);
+        intent.putExtra("selectedTime", selectedTime);
+        intent.putExtra("selectedSeats", selectedSeats);
+        intent.putExtra("price", price);
+        intent.putExtra("discount", discount);
+
+        startActivity(intent);
     }
 
     private void initSeatsList() {
         // Initialize the GridLayoutManager with 7 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7);
 
-        // Set the SpanSizeLookup to manage how the items are placed in the grid
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -92,12 +136,18 @@ public class SeatListActivity extends AppCompatActivity {
                 // Update the number of selected seats
                 binding.numberSelectedTxt.setText(num + " Seat Selected");
 
+                // Update selected seats list
+                selectedSeats.clear();
+                for (int i = 0; i < num; i++) {
+                    selectedSeats.add("Seat " + (i + 1));
+                }
+
                 // Format the price
                 DecimalFormat df = new DecimalFormat("#.##");
-                double calculatedPrice = Double.parseDouble(df.format(num * film.getPrice()));
+                price = Double.parseDouble(df.format(num * film.getPrice()));
 
                 // Update the price text
-                binding.priceTxt.setText("$ " + calculatedPrice);
+                binding.priceTxt.setText("$ " + price);
 
                 // Update the number of selected seats
                 number = num;
@@ -117,8 +167,6 @@ public class SeatListActivity extends AppCompatActivity {
         binding.dateRecyclerview.setAdapter(new DateAdapter(generateDates()));
     }
 
-
-
     private void setVariables() {
         binding.backBtn.setOnClickListener(v -> finish());
     }
@@ -128,6 +176,11 @@ public class SeatListActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             film = (Film) intent.getSerializableExtra("film");
+            filmName = film != null ? film.getTitle() : "Unknown Film";
+
+            // Set default date and time (you might want to modify this based on user selection)
+            selectedDate = generateDates().get(0);
+            selectedTime = generateTimeSlots().get(0);
         }
     }
 

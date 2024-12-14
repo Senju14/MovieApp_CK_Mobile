@@ -12,6 +12,19 @@
     <string name="upcoming_movies">Phim sắp ra mắt</string>
 
     <string name="watch_now">Xem ngay</string>
+    <string name="buy_ticket">Mua vé</string>
     <string name="movie_summary">Tóm tắt</string>
     <string name="cast">Diễn viên</string>
+
+    <string name="name">Tên</string>
+    <string name="username">Tên người dùng</string>
+    <string name="film_name">Tên phim</string>
+    <string name="date">Ngày</string>
+    <string name="time">Giờ</string>
+    <string name="seats">Chỗ ngồi</string>
+    <string name="price">Giá</string>
+    <string name="discount">Khuyến mãi</string>
+
+    <string name="back">Quay lại</string>
+    <string name="Continue">Tiếp tục</string>
 </resources>

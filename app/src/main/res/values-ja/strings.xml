@@ -12,6 +12,19 @@
     <string name="upcoming_movies">今後の映画</string>
 
     <string name="watch_now">今すぐ見る</string>
+    <string name="buy_ticket">チケットを購入する</string>
     <string name="movie_summary">概要</string>
     <string name="cast">キャスト</string>
+
+    <string name="name">名前</string>
+    <string name="username">ユーザー名</string>
+    <string name="film_name">映画名</string>
+    <string name="date">日付</string>
+    <string name="time">時間</string>
+    <string name="seats">席</string>
+    <string name="price">価格</string>
+    <string name="discount">割引</string>
+
+    <string name="back">戻る</string>
+    <string name="Continue">続く</string>
 </resources>

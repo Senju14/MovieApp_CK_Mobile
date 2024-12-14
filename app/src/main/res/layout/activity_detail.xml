@@ -203,7 +203,7 @@
                 android:layout_width="163dp"
                 android:layout_height="43dp"
                 android:background="@drawable/orange_bg"
-                android:text="Buy Ticket"
+                android:text="@string/buy_ticket"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
