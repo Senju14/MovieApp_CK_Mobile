@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,9 +52,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+
 public class MainActivity extends AppCompatActivity {
 
-
+    ImageView profileImageView;
     private EditText searchEditText;
     private RecyclerView searchResultRecyclerView;
     private List<MovieItem> movieList = new ArrayList<>();
@@ -134,7 +136,18 @@ public class MainActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     String name = snapshot.child("name").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
+                    String username = snapshot.child("username").getValue(String.class);
+                    String password = snapshot.child("password").getValue(String.class);
                     updateUserInfoUI(name, email);
+                    profileImageView = findViewById(R.id.imgProfile);
+                    profileImageView.setOnClickListener(v -> {
+                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                        intent.putExtra("name", name);
+                        intent.putExtra("email", email);
+                        intent.putExtra("username", username);
+                        intent.putExtra("password", password);
+                        startActivity(intent);
+                    });
                 }
             }
 
