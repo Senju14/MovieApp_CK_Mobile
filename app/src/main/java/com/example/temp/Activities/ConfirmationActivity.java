@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.temp.Domains.Film;
 import com.example.temp.databinding.ActivityConfirmationBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,8 +42,8 @@ public class ConfirmationActivity extends AppCompatActivity {
         String filmName = getIntent().getStringExtra("filmName");
         String selectedDate = getIntent().getStringExtra("selectedDate");
         String selectedTime = getIntent().getStringExtra("selectedTime");
-        Log.d("ConfirmationActivity", "Date: " + selectedDate);
-        Log.d("ConfirmationActivity", "Time: " + selectedTime);
+//        Log.d("ConfirmationActivity", "Date: " + selectedDate);
+//        Log.d("ConfirmationActivity", "Time: " + selectedTime);
         ArrayList<String> selectedSeats = getIntent().getStringArrayListExtra("selectedSeats");
         double price = getIntent().getDoubleExtra("price", 0.0);
         double discount = getIntent().getDoubleExtra("discount", 0.0);
@@ -78,9 +79,21 @@ public class ConfirmationActivity extends AppCompatActivity {
         binding.dateTxt.setText("Date: " + selectedDate);
         binding.timeTxt.setText("Time: " + selectedTime);
         binding.seatsTxt.setText("Seats: " + selectedSeats.toString());
+
         binding.priceTxt.setText("Price: " + vnFormat.format(price * 24000));
         binding.discountTxt.setText("Discount: " + vnFormat.format(discount * 24000));
         binding.totalTxt.setText("Total: " + vnFormat.format(total * 24000));
+
+
+        Film film = (Film) getIntent().getSerializableExtra("film");
+
+        if (film != null) {
+            binding.titleTxt.setText("Film: " + film.getTitle());
+            Glide.with(this)
+                    .load(film.getPoster()) // URL hoặc resource của poster
+                    .into(binding.filmPic); // ID của ImageView hiển thị poster
+        }
+
     }
 
     private void saveBookingToFirebase(String name, String username, String filmName,

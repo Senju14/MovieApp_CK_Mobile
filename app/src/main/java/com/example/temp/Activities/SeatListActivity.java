@@ -41,7 +41,7 @@ public class SeatListActivity extends AppCompatActivity {
     private int number = 0;
 
     private ArrayList<String> selectedSeats = new ArrayList<>();
-    private double discount = 0.0;
+    private double discount = 10.0;
     private String filmName;
     private String selectedDate;
     private String selectedTime;
@@ -68,6 +68,7 @@ public class SeatListActivity extends AppCompatActivity {
         // Handle "Continue" button
         binding.button2.setOnClickListener(v -> {
             proceedToConfirmation();
+
         });
     }
 
@@ -112,12 +113,7 @@ public class SeatListActivity extends AppCompatActivity {
                 intent.putExtra("filmName", filmName);
                 intent.putExtra("selectedDate", selectedDate);
                 intent.putExtra("selectedTime", selectedTime);
-
-
-                Log.d("test", "Date: " + selectedDate);
-                Log.d("test", "Time: " + selectedTime);
-
-
+                intent.putExtra("film", film);
                 intent.putExtra("selectedSeats", selectedSeats);
                 intent.putExtra("price", price);
                 intent.putExtra("discount", discount);
@@ -139,8 +135,6 @@ public class SeatListActivity extends AppCompatActivity {
             @Override
             public void onTimeSelected(String time) {
                 selectedTime = time;
-                // Cập nhật UI để phản ánh giờ đã chọn (nếu cần)
-                binding.numberSelectedTxt.setText("Time Selected: " + selectedTime);
             }
         });
         binding.TimeRecyclerview.setLayoutManager(
@@ -153,8 +147,6 @@ public class SeatListActivity extends AppCompatActivity {
             @Override
             public void onDateSelected(String date) {
                 selectedDate = date;
-                // Cập nhật UI để phản ánh ngày đã chọn (nếu cần)
-                binding.numberSelectedTxt.setText("Date Selected: " + selectedDate);
             }
         });
         binding.dateRecyclerview.setLayoutManager(
@@ -244,13 +236,13 @@ public class SeatListActivity extends AppCompatActivity {
             List<String> dates = generateDates();
             List<String> times = generateTimeSlots();
 
-            // Set default date and time (you might want to modify this based on user selection)
-//            selectedDate = generateDates().get(0);
-//            selectedTime = generateTimeSlots().get(0);
 
-            selectedDate = dates.isEmpty() ? "Unknown Date" : dates.get(0);
-            selectedTime = times.isEmpty() ? "Unknown Time" : times.get(0);
+
+            selectedDate = intent.getStringExtra("selectedDate");
+            selectedTime = intent.getStringExtra("selectedTime");
+
         }
+
     }
 
     // Method to generate time slots

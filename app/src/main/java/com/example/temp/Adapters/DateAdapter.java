@@ -22,6 +22,7 @@ public class DateAdapter extends RecyclerView.Adapter<DateAdapter.DateViewHolder
         void onDateSelected(String selectedDate);
     }
 
+
     public DateAdapter(List<String> timeSlots, OnDateSelectedListener listener) {
         this.timeSlots = timeSlots;
         this.listener = listener;
