@@ -17,7 +17,7 @@ public class SeatListAdapter extends RecyclerView.Adapter<SeatListAdapter.SeatVi
     private List<Seat> seatList;
     private Context context;
     private SelectedSeat selectedSeat;
-    private List<String> selectedSeatName;
+    private ArrayList<String> selectedSeatName;
 
     public SeatListAdapter(List<Seat> seatList, Context context, SelectedSeat selectedSeat) {
         this.seatList = seatList;
@@ -77,8 +77,8 @@ public class SeatListAdapter extends RecyclerView.Adapter<SeatListAdapter.SeatVi
                     break;
             }
 
-            String selected = String.join(", ", selectedSeatName);
-            selectedSeat.Return(selected, selectedSeatName.size());
+//            String selected = String.join(", ", selectedSeatName);
+            selectedSeat.Return(selectedSeatName, selectedSeatName.size());
         });
     }
 
@@ -88,6 +88,6 @@ public class SeatListAdapter extends RecyclerView.Adapter<SeatListAdapter.SeatVi
     }
 
     public interface SelectedSeat {
-        void Return(String selectedName, int num);
+        void Return(ArrayList<String> selectedName, int num);
     }
 }

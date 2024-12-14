@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -77,6 +78,16 @@ public class SeatListActivity extends AppCompatActivity {
             return;
         }
 
+        if (selectedDate == null || selectedDate.isEmpty()) {
+            Toast.makeText(this, "Please select a date", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (selectedTime == null || selectedTime.isEmpty()) {
+            Toast.makeText(this, "Please select a time", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Get current user
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
@@ -101,6 +112,12 @@ public class SeatListActivity extends AppCompatActivity {
                 intent.putExtra("filmName", filmName);
                 intent.putExtra("selectedDate", selectedDate);
                 intent.putExtra("selectedTime", selectedTime);
+
+
+                Log.d("test", "Date: " + selectedDate);
+                Log.d("test", "Time: " + selectedTime);
+
+
                 intent.putExtra("selectedSeats", selectedSeats);
                 intent.putExtra("price", price);
                 intent.putExtra("discount", discount);
@@ -114,6 +131,37 @@ public class SeatListActivity extends AppCompatActivity {
 
 
     private void initSeatsList() {
+
+
+        // Set up time adapter with selection listener
+        List<String> timeSlots = generateTimeSlots();
+        TimeAdapter timeAdapter = new TimeAdapter(timeSlots, new TimeAdapter.OnTimeSelectedListener() {
+            @Override
+            public void onTimeSelected(String time) {
+                selectedTime = time;
+                // Cập nhật UI để phản ánh giờ đã chọn (nếu cần)
+                binding.numberSelectedTxt.setText("Time Selected: " + selectedTime);
+            }
+        });
+        binding.TimeRecyclerview.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        binding.TimeRecyclerview.setAdapter(timeAdapter);
+
+        // Set up date adapter with selection listener
+        List<String> dates = generateDates();
+        DateAdapter dateAdapter = new DateAdapter(dates, new DateAdapter.OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(String date) {
+                selectedDate = date;
+                // Cập nhật UI để phản ánh ngày đã chọn (nếu cần)
+                binding.numberSelectedTxt.setText("Date Selected: " + selectedDate);
+            }
+        });
+        binding.dateRecyclerview.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        binding.dateRecyclerview.setAdapter(dateAdapter);
+
+
         // Initialize the GridLayoutManager with 7 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7);
 
@@ -150,15 +198,11 @@ public class SeatListActivity extends AppCompatActivity {
         // Create and set the SeatListAdapter with a custom implementation of SelectedSeat
         SeatListAdapter seatAdapter = new SeatListAdapter(seatList, this, new SeatListAdapter.SelectedSeat() {
             @Override
-            public void Return(String selectedName, int num) {
+            public void Return(ArrayList<String> selectedName, int num) {
                 // Update the number of selected seats
                 binding.numberSelectedTxt.setText(num + " Seat Selected");
 
-                // Update selected seats list
-                selectedSeats.clear();
-                for (int i = 0; i < num; i++) {
-                    selectedSeats.add("Seat " + (i + 1));
-                }
+                selectedSeats = selectedName;
 
                 // Format the price
                 DecimalFormat df = new DecimalFormat("#.##");
@@ -196,9 +240,16 @@ public class SeatListActivity extends AppCompatActivity {
             film = (Film) intent.getSerializableExtra("film");
             filmName = film != null ? film.getTitle() : "Unknown Film";
 
+            // Initialize with first items in lists
+            List<String> dates = generateDates();
+            List<String> times = generateTimeSlots();
+
             // Set default date and time (you might want to modify this based on user selection)
-            selectedDate = generateDates().get(0);
-            selectedTime = generateTimeSlots().get(0);
+//            selectedDate = generateDates().get(0);
+//            selectedTime = generateTimeSlots().get(0);
+
+            selectedDate = dates.isEmpty() ? "Unknown Date" : dates.get(0);
+            selectedTime = times.isEmpty() ? "Unknown Time" : times.get(0);
         }
     }
 

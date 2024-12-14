@@ -14,16 +14,23 @@ import java.util.List;
 
 public class DateAdapter extends RecyclerView.Adapter<DateAdapter.DateViewHolder> {
     private final List<String> timeSlots;
-    private int selectedPosition = RecyclerView.NO_POSITION;
+//    private int selectedPosition = RecyclerView.NO_POSITION;
+    private int selectedPosition = 0;
     private OnDateSelectedListener listener;
 
     public interface OnDateSelectedListener {
-        void onDateSelected(int position);
+        void onDateSelected(String selectedDate);
     }
 
-    public DateAdapter(List<String> timeSlots) {
+    public DateAdapter(List<String> timeSlots, OnDateSelectedListener listener) {
         this.timeSlots = timeSlots;
         this.listener = listener;
+    }
+
+    // New overloaded constructor without listener
+    public DateAdapter(List<String> timeSlots) {
+        this.timeSlots = timeSlots;
+        this.listener = null;
     }
 
     public static class DateViewHolder extends RecyclerView.ViewHolder {
@@ -82,7 +89,7 @@ public class DateAdapter extends RecyclerView.Adapter<DateAdapter.DateViewHolder
 
                 // Callback to inform about date selection
                 if (listener != null) {
-                    listener.onDateSelected(selectedPosition);
+                    listener.onDateSelected(timeSlots.get(selectedPosition));
                 }
             }
         });

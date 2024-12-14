@@ -157,6 +157,8 @@ public class DetailActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+
+
         binding.imageView7.setOnClickListener(v -> {
             if (item != null) {
                 // Tạo nội dung để chia sẻ

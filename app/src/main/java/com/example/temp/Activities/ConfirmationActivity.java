@@ -1,10 +1,12 @@
 package com.example.temp.Activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.temp.databinding.ActivityConfirmationBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,12 +33,16 @@ public class ConfirmationActivity extends AppCompatActivity {
         // Initialize Firebase Database
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+
+
         // Get data from Intent
         String name = getIntent().getStringExtra("name");
         String username = getIntent().getStringExtra("username");
         String filmName = getIntent().getStringExtra("filmName");
         String selectedDate = getIntent().getStringExtra("selectedDate");
         String selectedTime = getIntent().getStringExtra("selectedTime");
+        Log.d("ConfirmationActivity", "Date: " + selectedDate);
+        Log.d("ConfirmationActivity", "Time: " + selectedTime);
         ArrayList<String> selectedSeats = getIntent().getStringArrayListExtra("selectedSeats");
         double price = getIntent().getDoubleExtra("price", 0.0);
         double discount = getIntent().getDoubleExtra("discount", 0.0);

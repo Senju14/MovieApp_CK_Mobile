@@ -14,16 +14,22 @@ import java.util.List;
 
 public class TimeAdapter extends RecyclerView.Adapter<TimeAdapter.TimeViewHolder> {
     private final List<String> timeSlots;
-    private int selectedPosition = RecyclerView.NO_POSITION;
+//    private int selectedPosition = RecyclerView.NO_POSITION;
+    private int selectedPosition = 0;
     private OnTimeSelectedListener listener;
 
     public interface OnTimeSelectedListener {
-        void onTimeSelected(int position);
+        void onTimeSelected(String selectedTime);
     }
 
-    public TimeAdapter(List<String> timeSlots) {
+    public TimeAdapter(List<String> timeSlots, OnTimeSelectedListener listener) {
         this.timeSlots = timeSlots;
         this.listener = listener;
+    }
+
+    public TimeAdapter(List<String> timeSlots) {  // Added overloaded constructor
+        this.timeSlots = timeSlots;
+        this.listener = null;
     }
 
     public static class TimeViewHolder extends RecyclerView.ViewHolder {
@@ -75,7 +81,7 @@ public class TimeAdapter extends RecyclerView.Adapter<TimeAdapter.TimeViewHolder
 
                 // Callback to inform about time selection
                 if (listener != null) {
-                    listener.onTimeSelected(selectedPosition);
+                    listener.onTimeSelected(timeSlots.get(selectedPosition));
                 }
             }
         });
