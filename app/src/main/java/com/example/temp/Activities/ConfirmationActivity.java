@@ -67,7 +67,7 @@ public class ConfirmationActivity extends AppCompatActivity {
         double total = price - discount;
 
         binding.nameTxt.setText("Name: " + name);
-        binding.usernameTxt.setText("Username: " + username);
+        binding.usernameTxt.setText("Email: " + username);
         binding.titleTxt.setText("Film: " + filmName);
         binding.dateTxt.setText("Date: " + selectedDate);
         binding.timeTxt.setText("Time: " + selectedTime);

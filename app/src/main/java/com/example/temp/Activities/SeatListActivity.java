@@ -1,5 +1,10 @@
 package com.example.temp.Activities;
 
+import com.google.firebase.database.DatabaseReference;
+
+import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
@@ -18,6 +23,8 @@ import com.example.temp.Domains.Seat;
 import com.example.temp.databinding.ActivitySeatListBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -77,23 +84,34 @@ public class SeatListActivity extends AppCompatActivity {
             return;
         }
 
-        // Prepare data to pass to Confirmation Activity
-        String name = currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User";
-        String username = currentUser.getEmail() != null ? currentUser.getEmail() : "Unknown";
+        String userId = currentUser.getUid();
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
 
-        // Create intent and pass data
-        Intent intent = new Intent(SeatListActivity.this, ConfirmationActivity.class);
-        intent.putExtra("name", name);
-        intent.putExtra("username", username);
-        intent.putExtra("filmName", filmName);
-        intent.putExtra("selectedDate", selectedDate);
-        intent.putExtra("selectedTime", selectedTime);
-        intent.putExtra("selectedSeats", selectedSeats);
-        intent.putExtra("price", price);
-        intent.putExtra("discount", discount);
+        // Read data from Realtime Database
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot snapshot = task.getResult();
+                String name = snapshot.child("name").getValue(String.class);
+                String email = currentUser.getEmail() != null ? currentUser.getEmail() : "Unknown";
 
-        startActivity(intent);
+                // Create intent and pass data
+                Intent intent = new Intent(SeatListActivity.this, ConfirmationActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("username", email);
+                intent.putExtra("filmName", filmName);
+                intent.putExtra("selectedDate", selectedDate);
+                intent.putExtra("selectedTime", selectedTime);
+                intent.putExtra("selectedSeats", selectedSeats);
+                intent.putExtra("price", price);
+                intent.putExtra("discount", discount);
+
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     private void initSeatsList() {
         // Initialize the GridLayoutManager with 7 columns
