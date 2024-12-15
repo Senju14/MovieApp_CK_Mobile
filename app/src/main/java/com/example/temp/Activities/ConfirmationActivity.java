@@ -100,69 +100,75 @@ public class ConfirmationActivity extends AppCompatActivity {
         Log.d("test", "total: " + total);
         String totalString = String.format("%.0f", total);
 
-        binding.continueBtn.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-                CreateOrder orderApi = new CreateOrder();
-                try {
-                    JSONObject data = orderApi.createOrder(totalString);
-                    String code = data.getString("return_code");
-
-                    if (code.equals("1")) {
-                        String token = data.getString("zp_trans_token");
-                        ZaloPaySDK.getInstance().payOrder(ConfirmationActivity.this, token, "demozpdk://app", new PayOrderListener() {
-                            @Override
-                            public void onPaymentSucceeded(String zpTransToken, String appTransId, String zpTransId) {
-                                Log.d("Kiem tra ne ahihih", "Oi troi oi no khong xuat hien");
-
-                                saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-
-                                // Lắng nghe kết quả lưu Firebase
-                                DatabaseReference bookingsRef = mDatabase.child("bookings");
-                                bookingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if (snapshot.exists()) {
-                                            Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
-                                            intent.putExtra("result", "Payment successful");
-                                            startActivity(intent);
-                                        } else {
-                                            Toast.makeText(ConfirmationActivity.this, "Lưu dữ liệu lên Firebase thất bại.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        // Xử lý lỗi nếu không thể lưu Firebase
-                                        Toast.makeText(ConfirmationActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
+        binding.continueBtn.setOnClickListener(v -> showPaymentOptions(
+                name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount
+        ));
 
 
-                            @Override
-                            public void onPaymentCanceled(String s, String s1) {
-                                Intent intent1 = new Intent(ConfirmationActivity.this, ResultActivity.class);
-                                intent1.putExtra("result", "Payment Canceled");
-                                startActivity(intent1);
-                            }
-
-                            @Override
-                            public void onPaymentError(ZaloPayError zaloPayError, String s, String s1) {
-                                Intent intent1 = new Intent(ConfirmationActivity.this, ResultActivity.class);
-                                intent1.putExtra("result", "Payment Error");
-                                startActivity(intent1);
-                            }
-                        });
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        binding.continueBtn.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
+//                CreateOrder orderApi = new CreateOrder();
+//                try {
+//                    JSONObject data = orderApi.createOrder(totalString);
+//                    String code = data.getString("return_code");
+//
+//                    if (code.equals("1")) {
+//                        String token = data.getString("zp_trans_token");
+//                        ZaloPaySDK.getInstance().payOrder(ConfirmationActivity.this, token, "demozpdk://app", new PayOrderListener() {
+//                            @Override
+//                            public void onPaymentSucceeded(String zpTransToken, String appTransId, String zpTransId) {
+//                                Log.d("Kiem tra ne ahihih", "Oi troi oi no khong xuat hien");
+//
+//                                saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
+//
+//                                // Lắng nghe kết quả lưu Firebase
+//                                DatabaseReference bookingsRef = mDatabase.child("bookings");
+//                                bookingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                        if (snapshot.exists()) {
+//                                            Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
+//                                            intent.putExtra("result", "Payment successful");
+//                                            startActivity(intent);
+//                                            finish();
+//                                        } else {
+//                                            Toast.makeText(ConfirmationActivity.this, "Lưu dữ liệu lên Firebase thất bại.", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError error) {
+//                                        // Xử lý lỗi nếu không thể lưu Firebase
+//                                        Toast.makeText(ConfirmationActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+//                                    }
+//                                });
+//                            }
+//
+//
+//                            @Override
+//                            public void onPaymentCanceled(String s, String s1) {
+//                                Intent intent1 = new Intent(ConfirmationActivity.this, ResultActivity.class);
+//                                intent1.putExtra("result", "Payment Canceled");
+//                                startActivity(intent1);
+//                            }
+//
+//                            @Override
+//                            public void onPaymentError(ZaloPayError zaloPayError, String s, String s1) {
+//                                Intent intent1 = new Intent(ConfirmationActivity.this, ResultActivity.class);
+//                                intent1.putExtra("result", "Payment Error");
+//                                startActivity(intent1);
+//                            }
+//                        });
+//                    }
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
     }
 
@@ -178,23 +184,79 @@ public class ConfirmationActivity extends AppCompatActivity {
         BottomSheetDialog paymentDialog = new BottomSheetDialog(this);
         paymentDialog.setContentView(R.layout.dialog_payment_options);
 
+        // Xử lý khi chọn ZaloPay
         paymentDialog.findViewById(R.id.zalopayOption).setOnClickListener(v -> {
-//            paymentDialog.dismiss();
-//            openZaloPayScreen(filmName, price - discount);
+            paymentDialog.dismiss(); // Đóng popup
+            processZaloPayPayment(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
         });
 
-        paymentDialog.findViewById(R.id.momoOption).setOnClickListener(v -> {
-//            paymentDialog.dismiss();
-//            openMoMoScreen(filmName, price - discount);
-        });
-
+        // Xử lý khi chọn tiền mặt
         paymentDialog.findViewById(R.id.cashOption).setOnClickListener(v -> {
-            paymentDialog.dismiss();
+            paymentDialog.dismiss(); // Đóng popup
             saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
+            Toast.makeText(this, "Đặt vé thành công (Thanh toán tiền mặt)", Toast.LENGTH_SHORT).show();
         });
 
         paymentDialog.show();
     }
+
+    private void processZaloPayPayment(String name, String username, String filmName,
+                                       String selectedDate, String selectedTime,
+                                       ArrayList<String> selectedSeats, double price, double discount) {
+        Double price1 = price * 24000; // Giá tiền
+        Double discount1 = price1 * discount; // Mức giảm giá
+        Double total = price1 - discount1; // Tổng tiền sau giảm giá
+        String totalString = String.format("%.0f", total); // Định dạng số tiền
+
+        CreateOrder orderApi = new CreateOrder();
+        try {
+            JSONObject data = orderApi.createOrder(totalString);
+            String code = data.getString("return_code");
+
+            if (code.equals("1")) {
+                String token = data.getString("zp_trans_token");
+                ZaloPaySDK.getInstance().payOrder(this, token, "demozpdk://app", new PayOrderListener() {
+                    @Override
+                    public void onPaymentSucceeded(String zpTransToken, String appTransId, String zpTransId) {
+                        // Lưu thông tin đặt vé vào Firebase
+                        saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
+
+                        // Chuyển sang ResultActivity sau khi thanh toán thành công
+                        Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
+                        intent.putExtra("result", "Payment successful");
+                        intent.putExtra("name", name);
+                        intent.putExtra("username", username);
+                        intent.putExtra("filmName", filmName);
+                        intent.putExtra("date", selectedDate);
+                        intent.putExtra("time", selectedTime);
+                        intent.putStringArrayListExtra("seats", selectedSeats);
+                        intent.putExtra("totalPrice", total);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onPaymentCanceled(String s, String s1) {
+                        Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
+                        intent.putExtra("result", "Payment Canceled");
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onPaymentError(ZaloPayError zaloPayError, String s, String s1) {
+                        Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
+                        intent.putExtra("result", "Payment Error");
+                        startActivity(intent);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Lỗi khi tạo đơn hàng ZaloPay", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
 
 //    private void openMoMoScreen(String filmName, double totalAmount) {
 //        Intent intent = new Intent(this, MoMoPaymentActivity.class);
@@ -282,7 +344,7 @@ public class ConfirmationActivity extends AppCompatActivity {
         // Save booking
         bookingsRef.child(bookingId).setValue(bookingData)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Booking saved successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Directly to payment", Toast.LENGTH_SHORT).show();
 
                     // Add booking reference to user's profile
                     usersRef.child(userId).child("bookings").child(bookingId).setValue(true);
