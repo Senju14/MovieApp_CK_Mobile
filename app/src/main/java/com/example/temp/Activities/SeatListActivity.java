@@ -120,16 +120,21 @@ public class SeatListActivity extends AppCompatActivity {
 
 
     private void initSeatsList() {
-
-
+        Log.d("SeatListActivity", "initSeatsList() called");
         // Set up time adapter with selection listener
         List<String> timeSlots = generateTimeSlots();
         TimeAdapter timeAdapter = new TimeAdapter(timeSlots, new TimeAdapter.OnTimeSelectedListener() {
+
             @Override
             public void onTimeSelected(String time) {
                 selectedTime = time;
+                Log.d("SeatListActivity", "Selected Time: " + selectedTime);
             }
+
         });
+
+//        Log.d("ngaày nè", "check ngày đi: " + selectedDate);
+//        Log.d("giờ nè", "check giờ đi: " + selectedTime);
         binding.TimeRecyclerview.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.TimeRecyclerview.setAdapter(timeAdapter);
@@ -140,8 +145,10 @@ public class SeatListActivity extends AppCompatActivity {
             @Override
             public void onDateSelected(String date) {
                 selectedDate = date;
+                Log.d("SeatListActivity", "Selected Date: " + selectedDate);
             }
         });
+
         binding.dateRecyclerview.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.dateRecyclerview.setAdapter(dateAdapter);
@@ -207,11 +214,14 @@ public class SeatListActivity extends AppCompatActivity {
 
         // Set layout manager and adapter for the time RecyclerView
         binding.TimeRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.TimeRecyclerview.setAdapter(new TimeAdapter(generateTimeSlots()));
+//        binding.TimeRecyclerview.setAdapter(new TimeAdapter(generateTimeSlots()));
+        binding.TimeRecyclerview.setAdapter(timeAdapter);
+
 
         // Set layout manager and adapter for the date RecyclerView
         binding.dateRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.dateRecyclerview.setAdapter(new DateAdapter(generateDates()));
+//        binding.dateRecyclerview.setAdapter(new DateAdapter(generateDates()));
+        binding.dateRecyclerview.setAdapter(dateAdapter);
     }
 
     private void setVariables() {
@@ -229,10 +239,10 @@ public class SeatListActivity extends AppCompatActivity {
             List<String> dates = generateDates();
             List<String> times = generateTimeSlots();
 
-
-
             selectedDate = intent.getStringExtra("selectedDate");
             selectedTime = intent.getStringExtra("selectedTime");
+
+
 
         }
 

@@ -1,6 +1,7 @@
 package com.example.temp.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -80,6 +81,7 @@ public class DateAdapter extends RecyclerView.Adapter<DateAdapter.DateViewHolder
 
         holder.itemView.setOnClickListener(v -> {
             int adapterPosition = holder.getAdapterPosition();
+            Log.d("Adapter", "Item clicked: " + adapterPosition);
             if (adapterPosition != RecyclerView.NO_POSITION) {
                 int previousSelectedPosition = selectedPosition;
                 selectedPosition = adapterPosition;
@@ -90,7 +92,10 @@ public class DateAdapter extends RecyclerView.Adapter<DateAdapter.DateViewHolder
 
                 // Callback to inform about date selection
                 if (listener != null) {
+                    Log.d("Adapter", "Listener triggered for: " + timeSlots.get(selectedPosition));
                     listener.onDateSelected(timeSlots.get(selectedPosition));
+                } else {
+                    Log.d("Adapter", "Listener is null");
                 }
             }
         });
