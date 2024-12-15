@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.temp.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
-    TextView profileName, profileEmail, profileUsername, profilePassword;
+    TextView profileName, profileEmail, profileUsername, profilePassword, profilePoints;
     TextView titleName, titleUsername;
     Button editProfile;
 
@@ -37,6 +38,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileEmail = findViewById(R.id.profileEmail);
         profileUsername = findViewById(R.id.profileUsername);
         profilePassword = findViewById(R.id.profilePassword);
+        profilePoints = findViewById(R.id.point);
         titleName = findViewById(R.id.titleName);
         titleUsername = findViewById(R.id.titleUsername);
         editProfile = findViewById(R.id.editButton);
@@ -76,7 +78,36 @@ public class ProfileActivity extends AppCompatActivity {
         profileEmail.setText(emailUser);
         profileUsername.setText(usernameUser);
         profilePassword.setText(passwordUser);
+        getUserPoints();
     }
+
+    private void getUserPoints() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        usersRef.child("points").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Integer points = snapshot.getValue(Integer.class);
+                    if (points != null) {
+                        // Hiển thị điểm vào TextView
+                        profilePoints.setText(points +"");
+                    } else {
+                        profilePoints.setText("0");
+                    }
+                } else {
+                    profilePoints.setText("0");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to load points: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     public void passUserData() {
         String userUsername = profileUsername.getText().toString().trim();

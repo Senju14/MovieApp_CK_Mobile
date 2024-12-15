@@ -20,6 +20,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
@@ -49,8 +51,6 @@ public class ConfirmationActivity extends AppCompatActivity {
         // Initialize Firebase Database
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-
-
         // Get data from Intent
         String name = getIntent().getStringExtra("name");
         String username = getIntent().getStringExtra("username");
@@ -79,20 +79,6 @@ public class ConfirmationActivity extends AppCompatActivity {
 
         ZaloPaySDK.init(2553, Environment.SANDBOX);
 
-        // Handle continue button
-//        binding.continueBtn.setOnClickListener(v -> {
-//            // Save booking to Firebase
-//            saveBookingToFirebase(name, username, filmName, selectedDate,
-//                    selectedTime, selectedSeats, price, discount);
-//
-//        });
-
-
-//        Log.d("test", "discount: " + discount);
-//        Log.d("test", "price: " + price);
-//        Log.d("test", "price1: " + price1);
-//        Log.d("test", "price1 * discount: " + price1*discount);
-
         Double price1 = price * 24000;
         Double discount1 = price1 * discount;
 
@@ -103,72 +89,6 @@ public class ConfirmationActivity extends AppCompatActivity {
         binding.continueBtn.setOnClickListener(v -> showPaymentOptions(
                 name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount
         ));
-
-
-//        binding.continueBtn.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-//                CreateOrder orderApi = new CreateOrder();
-//                try {
-//                    JSONObject data = orderApi.createOrder(totalString);
-//                    String code = data.getString("return_code");
-//
-//                    if (code.equals("1")) {
-//                        String token = data.getString("zp_trans_token");
-//                        ZaloPaySDK.getInstance().payOrder(ConfirmationActivity.this, token, "demozpdk://app", new PayOrderListener() {
-//                            @Override
-//                            public void onPaymentSucceeded(String zpTransToken, String appTransId, String zpTransId) {
-//                                Log.d("Kiem tra ne ahihih", "Oi troi oi no khong xuat hien");
-//
-//                                saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-//
-//                                // Lắng nghe kết quả lưu Firebase
-//                                DatabaseReference bookingsRef = mDatabase.child("bookings");
-//                                bookingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                        if (snapshot.exists()) {
-//                                            Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
-//                                            intent.putExtra("result", "Payment successful");
-//                                            startActivity(intent);
-//                                            finish();
-//                                        } else {
-//                                            Toast.makeText(ConfirmationActivity.this, "Lưu dữ liệu lên Firebase thất bại.", Toast.LENGTH_SHORT).show();
-//                                        }
-//                                    }
-//
-//                                    @Override
-//                                    public void onCancelled(@NonNull DatabaseError error) {
-//                                        // Xử lý lỗi nếu không thể lưu Firebase
-//                                        Toast.makeText(ConfirmationActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-//                            }
-//
-//
-//                            @Override
-//                            public void onPaymentCanceled(String s, String s1) {
-//                                Intent intent1 = new Intent(ConfirmationActivity.this, ResultActivity.class);
-//                                intent1.putExtra("result", "Payment Canceled");
-//                                startActivity(intent1);
-//                            }
-//
-//                            @Override
-//                            public void onPaymentError(ZaloPayError zaloPayError, String s, String s1) {
-//                                Intent intent1 = new Intent(ConfirmationActivity.this, ResultActivity.class);
-//                                intent1.putExtra("result", "Payment Error");
-//                                startActivity(intent1);
-//                            }
-//                        });
-//                    }
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
 
     }
 
@@ -184,17 +104,16 @@ public class ConfirmationActivity extends AppCompatActivity {
         BottomSheetDialog paymentDialog = new BottomSheetDialog(this);
         paymentDialog.setContentView(R.layout.dialog_payment_options);
 
-        // Xử lý khi chọn ZaloPay
         paymentDialog.findViewById(R.id.zalopayOption).setOnClickListener(v -> {
-            paymentDialog.dismiss(); // Đóng popup
+            paymentDialog.dismiss();
+            saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
             processZaloPayPayment(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
         });
 
-        // Xử lý khi chọn tiền mặt
         paymentDialog.findViewById(R.id.cashOption).setOnClickListener(v -> {
-            paymentDialog.dismiss(); // Đóng popup
+            paymentDialog.dismiss();
             saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-            Toast.makeText(this, "Đặt vé thành công (Thanh toán tiền mặt)", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ticket booking successful (Cash payment)", Toast.LENGTH_SHORT).show();
         });
 
         paymentDialog.show();
@@ -203,10 +122,10 @@ public class ConfirmationActivity extends AppCompatActivity {
     private void processZaloPayPayment(String name, String username, String filmName,
                                        String selectedDate, String selectedTime,
                                        ArrayList<String> selectedSeats, double price, double discount) {
-        Double price1 = price * 24000; // Giá tiền
-        Double discount1 = price1 * discount; // Mức giảm giá
-        Double total = price1 - discount1; // Tổng tiền sau giảm giá
-        String totalString = String.format("%.0f", total); // Định dạng số tiền
+        Double price1 = price * 24000;
+        Double discount1 = price1 * discount;
+        Double total = price1 - discount1;
+        String totalString = String.format("%.0f", total);
 
         CreateOrder orderApi = new CreateOrder();
         try {
@@ -218,10 +137,9 @@ public class ConfirmationActivity extends AppCompatActivity {
                 ZaloPaySDK.getInstance().payOrder(this, token, "demozpdk://app", new PayOrderListener() {
                     @Override
                     public void onPaymentSucceeded(String zpTransToken, String appTransId, String zpTransId) {
-                        // Lưu thông tin đặt vé vào Firebase
+
                         saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
 
-                        // Chuyển sang ResultActivity sau khi thanh toán thành công
                         Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
                         intent.putExtra("result", "Payment successful");
                         intent.putExtra("name", name);
@@ -251,30 +169,10 @@ public class ConfirmationActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Lỗi khi tạo đơn hàng ZaloPay", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error when creating ZaloPay order", Toast.LENGTH_SHORT).show();
         }
     }
 
-
-
-
-//    private void openMoMoScreen(String filmName, double totalAmount) {
-//        Intent intent = new Intent(this, MoMoPaymentActivity.class);
-//        intent.putExtra("filmName", filmName);
-//        intent.putExtra("totalAmount", totalAmount);
-//        startActivity(intent);
-//    }
-//
-//    private void openZaloPayScreen(String filmName, double totalAmount) {
-//        Intent intent = new Intent(this, ZaloPayPaymentActivity.class);
-//        intent.putExtra("filmName", filmName);
-//        intent.putExtra("totalAmount", totalAmount);
-//        startActivity(intent);
-//    }
-
-
-
-    // Function to display booking details
     private void displayBookingDetails(String name, String username, String filmName,
                                        String selectedDate, String selectedTime,
                                        ArrayList<String> selectedSeats,
@@ -327,6 +225,8 @@ public class ConfirmationActivity extends AppCompatActivity {
         String userId = currentUser.getUid();
         double total = (price - discount)*2400;
 
+        int points = (int) (total / 1000);
+
         // Booking data
         Map<String, Object> bookingData = new HashMap<>();
         bookingData.put("name", name);
@@ -348,6 +248,27 @@ public class ConfirmationActivity extends AppCompatActivity {
 
                     // Add booking reference to user's profile
                     usersRef.child(userId).child("bookings").child(bookingId).setValue(true);
+                    usersRef.child(userId).child("points").runTransaction(new Transaction.Handler() {
+                        @Override
+                        public Transaction.Result doTransaction(MutableData currentData) {
+                            Integer currentPoints = currentData.getValue(Integer.class);
+                            if (currentPoints == null) {
+                                currentPoints = 0;
+                            }
+                            currentData.setValue(currentPoints + points);
+                            return Transaction.success(currentData);
+                        }
+
+                        @Override
+                        public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot currentData) {
+                            if (databaseError != null) {
+                                Toast.makeText(getApplicationContext(), "Failed to update points: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Integer updatedPoints = currentData.getValue(Integer.class);
+                                Toast.makeText(getApplicationContext(), "Points updated: " + updatedPoints, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
 
                     // Optional: Navigate to a success or next screen
                     // startActivity(new Intent(this, SomeNextActivity.class));
