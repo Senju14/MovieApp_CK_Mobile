@@ -23,6 +23,8 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class BookingHistoryActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private BookingHistoryAdapter adapter;
@@ -48,7 +50,10 @@ public class BookingHistoryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewBookingHistory);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         bookingList = new ArrayList<>();
-        adapter = new BookingHistoryAdapter(bookingList);
+
+        // Truyền thêm context (this) khi khởi tạo adapter
+        adapter = new BookingHistoryAdapter(bookingList, this);
+
         recyclerView.setAdapter(adapter);
 
         database = FirebaseDatabase.getInstance();

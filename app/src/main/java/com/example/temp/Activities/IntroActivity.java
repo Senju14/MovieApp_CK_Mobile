@@ -62,7 +62,7 @@ public class IntroActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish(); // Đóng IntroActivity để không thể quay lại
             }
-        }, 0000);
+        }, 3000);
 
         // Thiết lập chức năng cho nút chuyển đổi ngôn ngữ
         binding.langSwitchIcon.setOnClickListener(v -> showLanguageDialog());

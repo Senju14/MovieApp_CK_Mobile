@@ -22,6 +22,9 @@
             android:name=".Activities.EditProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".Activities.VerifyTicketActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.ProfileActivity"
             android:exported="false" />
         <activity
