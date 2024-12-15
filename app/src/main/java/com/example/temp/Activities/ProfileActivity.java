@@ -26,7 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
-    TextView profileName, profileEmail, profileUsername, profilePassword, profilePoints;
+    TextView profileName, profileEmail, profileUsername, profilePassword, profilePoints, rankText;
     TextView titleName, titleUsername;
     Button editProfile;
 
@@ -39,6 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileUsername = findViewById(R.id.profileUsername);
         profilePassword = findViewById(R.id.profilePassword);
         profilePoints = findViewById(R.id.point);
+        rankText = findViewById(R.id.rank);
         titleName = findViewById(R.id.titleName);
         titleUsername = findViewById(R.id.titleUsername);
         editProfile = findViewById(R.id.editButton);
@@ -72,14 +73,47 @@ public class ProfileActivity extends AppCompatActivity {
         String emailUser = intent.getStringExtra("email");
         String usernameUser = intent.getStringExtra("username");
         String passwordUser = intent.getStringExtra("password");
+
         titleName.setText(nameUser);
         titleUsername.setText(usernameUser);
         profileName.setText(nameUser);
         profileEmail.setText(emailUser);
         profileUsername.setText(usernameUser);
         profilePassword.setText(passwordUser);
+
         getUserPoints();
+        getUserSpending();
     }
+
+    private void getUserSpending() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        usersRef.child("spending").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                TextView spendingTextView = findViewById(R.id.spending);
+
+                if (snapshot.exists()) {
+                    Double spending = snapshot.getValue(Double.class);  // Assuming spending is stored as a Double
+                    if (spending != null) {
+                        // Display the spending amount in the TextView
+                        spendingTextView.setText(String.format("%.2f", spending));  // Format to 2 decimal places
+                    } else {
+                        spendingTextView.setText("0.00");
+                    }
+                } else {
+                    spendingTextView.setText("0.00");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ProfileActivity.this, "Failed to load spending: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void getUserPoints() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -93,11 +127,14 @@ public class ProfileActivity extends AppCompatActivity {
                     if (points != null) {
                         // Hiển thị điểm vào TextView
                         profilePoints.setText(points +"");
+                        updateDiscount(points);
                     } else {
                         profilePoints.setText("0");
+                        updateDiscount(0);
                     }
                 } else {
                     profilePoints.setText("0");
+                    updateDiscount(0);
                 }
             }
 
@@ -108,6 +145,33 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    // Function to update discount and rank based on points
+    private void updateDiscount(int points) {
+        double discount = 0.0;
+        String rank = "Standard"; // Default rank
+
+        // Apply discount logic
+        if (points >= 50 && points <= 50) {
+            discount = 0.1;
+            rank = "Silver";
+        } else if (points >= 51 && points <= 99) {
+            discount = 0.2;
+            rank = "Gold";
+        } else if (points >= 100) {
+            discount = 0.25;
+            rank = "VIP";
+        }
+
+        // Display discount in rank TextView
+        rankText.setText(rank + " (" + discount * 100 + "% discount)");  // Set rank with discount
+
+        // Optional: You can also display the discount as Toast or elsewhere if needed
+        Toast.makeText(ProfileActivity.this, "Your discount: " + discount * 100 + "%", Toast.LENGTH_SHORT).show();
+
+        // Truyền discount qua Intent sang ConfirmationActivity
+        Intent intent = new Intent(ProfileActivity.this, ConfirmationActivity.class);
+        intent.putExtra("discount", discount);
+    }
 
     public void passUserData() {
         String userUsername = profileUsername.getText().toString().trim();

@@ -51,6 +51,7 @@ public class ConfirmationActivity extends AppCompatActivity {
         // Initialize Firebase Database
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
+
         // Get data from Intent
         String name = getIntent().getStringExtra("name");
         String username = getIntent().getStringExtra("username");

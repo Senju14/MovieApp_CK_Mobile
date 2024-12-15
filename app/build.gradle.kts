@@ -72,4 +72,6 @@ dependencies {
     implementation ("com.google.firebase:firebase-database:21.0.0")
     implementation ("com.google.android.gms:play-services-auth:21.0.0")
     implementation ("com.squareup.picasso:picasso:2.71828")
+    implementation ("com.google.zxing:core:3.4.1")
+    implementation ("androidx.cardview:cardview:1.0.0")
 }

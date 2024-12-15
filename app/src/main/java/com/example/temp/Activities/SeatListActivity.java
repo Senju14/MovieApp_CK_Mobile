@@ -41,7 +41,7 @@ public class SeatListActivity extends AppCompatActivity {
     private int number = 0;
 
     private ArrayList<String> selectedSeats = new ArrayList<>();
-    private double discount = 0.1;
+
     private String filmName;
     private String selectedDate;
     private String selectedTime;
@@ -55,6 +55,7 @@ public class SeatListActivity extends AppCompatActivity {
 
         // Set the root view as the content view
         setContentView(binding.getRoot());
+
 
         // Get intent extras
         getIntentExtra();
@@ -78,8 +79,6 @@ public class SeatListActivity extends AppCompatActivity {
             Toast.makeText(this, "Please select seats", Toast.LENGTH_SHORT).show();
             return;
         }
-
-
 
         // Get current user
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -108,8 +107,7 @@ public class SeatListActivity extends AppCompatActivity {
                 intent.putExtra("film", film);
                 intent.putExtra("selectedSeats", selectedSeats);
                 intent.putExtra("price", price);
-                intent.putExtra("discount", discount);
-                Log.d("Test gia tien", "result" + price);
+//                Log.d("Test gia tien", "result" + price);
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
