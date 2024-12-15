@@ -44,11 +44,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(fileTree(mapOf(
-<<<<<<< HEAD
-        "dir" to "C:\\Users\\luuth\\Downloads\\Temp\\Movieapp",
-=======
-        "dir" to "D:\\temp\\android_zalopay",
->>>>>>> 03cc1cae7ffc06ea5dd04e2bd07370f1ace567a1
+        "dir" to "C:\\Users\\luuth\\Downloads\\Github\\MovieApp_CK_Mobile",
         "include" to listOf("*.aar", "*.jar"),
         "exclude" to listOf("")
     )))
@@ -64,7 +60,7 @@ dependencies {
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
     implementation("com.github.Dimezis:BlurView:version-2.0.3")
 
-    implementation("com.github.bumptech.glide:glide:4.15.1")  // Thêm Glide nếu chưa có
+    implementation("com.github.bumptech.glide:glide:4.15.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
 
     implementation ("com.google.firebase:firebase-auth:22.3.1")

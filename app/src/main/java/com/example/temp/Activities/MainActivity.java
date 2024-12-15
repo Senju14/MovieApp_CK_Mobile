@@ -47,6 +47,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +118,60 @@ public class MainActivity extends AppCompatActivity {
 
         displayUserInfo();
 
+        bottomMenuNavigation();
+    }
 
+    private void bottomMenuNavigation() {
+        // Add this after your other initialization code in onCreate
+        ChipNavigationBar bottomNavigationView = findViewById(R.id.bottomNavigation);
+        bottomNavigationView.setItemSelected(R.id.explorer, true); // Set default selected item
+        bottomNavigationView.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(int id) {
+
+
+                if (id == R.id.profile) {
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                    if (currentUser != null) {
+                        String uid = currentUser.getUid();
+                        DatabaseReference userRef = database.getReference("users").child(uid);
+                        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    String name = snapshot.child("name").getValue(String.class);
+                                    String email = snapshot.child("email").getValue(String.class);
+                                    String username = snapshot.child("username").getValue(String.class);
+                                    String password = snapshot.child("password").getValue(String.class);
+
+                                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                                    intent.putExtra("name", name);
+                                    intent.putExtra("email", email);
+                                    intent.putExtra("username", username);
+                                    intent.putExtra("password", password);
+                                    startActivity(intent);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.e("DatabaseError", error.getMessage());
+                            }
+                        });
+                    }
+                } else if (id == R.id.explorer) {
+                    // Handle explorer selection
+
+                } else if (id == R.id.favorites) {
+                    // Handle favorites selection
+
+
+                } else if (id == R.id.cart) {
+                    // Handle cart selection
+                }
+
+            }
+        });
     }
 
     private void displayUserInfo() {

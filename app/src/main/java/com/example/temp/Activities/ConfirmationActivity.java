@@ -2,24 +2,16 @@ package com.example.temp.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-<<<<<<< HEAD
-import android.util.Log;
-=======
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
->>>>>>> 03cc1cae7ffc06ea5dd04e2bd07370f1ace567a1
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-<<<<<<< HEAD
 import com.bumptech.glide.Glide;
 import com.example.temp.Domains.Film;
-=======
 import com.example.temp.Api.CreateOrder;
 import com.example.temp.R;
->>>>>>> 03cc1cae7ffc06ea5dd04e2bd07370f1ace567a1
 import com.example.temp.databinding.ActivityConfirmationBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
