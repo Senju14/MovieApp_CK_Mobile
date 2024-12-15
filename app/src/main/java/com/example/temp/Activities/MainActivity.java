@@ -1,9 +1,14 @@
 package com.example.temp.Activities;
 
+import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -21,6 +26,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -54,6 +61,8 @@ import com.example.temp.Activities.BookingHistoryActivity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import android.Manifest;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -121,6 +130,19 @@ public class MainActivity extends AppCompatActivity {
         displayUserInfo();
 
         bottomMenuNavigation();
+
+        // Check and request POST_NOTIFICATIONS permission for Android 13 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Showtime Notifications";
+            String description = "Channel for movie showtime notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("showtime_channel", name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+
     }
 
     private void bottomMenuNavigation() {
