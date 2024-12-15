@@ -10,6 +10,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
+import android.widget.ImageView;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.Window;
@@ -32,12 +34,20 @@ import com.example.temp.Adapters.CategoryEachFilmAdapter;
 import com.example.temp.Domains.Film;
 import com.example.temp.R;
 import com.example.temp.databinding.ActivityDetailBinding;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Locale;
 
 import eightbitlab.com.blurview.RenderScriptBlur;
 
 public class DetailActivity extends AppCompatActivity {
+
+    private ImageView bookmarkImageView;
+    private Film currentFilm;
+    private boolean isBookmarked = false;
+    private DatabaseReference databaseReference;
 
     private ActivityDetailBinding binding;
 
@@ -59,9 +69,68 @@ public class DetailActivity extends AppCompatActivity {
         // Thiết lập chức năng cho nút chuyển đổi ngôn ngữ
         binding.langSwitchIcon.setOnClickListener(v -> showLanguageDialog());
 
+        // Initialize Firebase reference
+        databaseReference = FirebaseDatabase.getInstance().getReference("bookmarks");
 
+        // Get Film object from Intent
+        currentFilm = (Film) getIntent().getSerializableExtra("object");
+
+        // Initialize bookmark ImageView
+        bookmarkImageView = findViewById(R.id.imageView8);
+
+        // Set the initial state of bookmark icon based on the current bookmark status
+        loadBookmarkStatus();
+
+        // Handle click on bookmark
+        bookmarkImageView.setOnClickListener(v -> {
+            isBookmarked = !isBookmarked;  // Toggle bookmark state
+            updateBookmarkStatus();
+            updateFirebase();
+        });
     }
 
+    private void loadBookmarkStatus() {
+        // Retrieve bookmark status from Firebase (you can check if the film is already bookmarked or not)
+        // For now, we assume the state is false (not bookmarked)
+        if (isBookmarked) {
+            bookmarkImageView.setImageResource(R.drawable.bookmark_filled);  // icon for bookmarked state
+        } else {
+            bookmarkImageView.setImageResource(R.drawable.bookmark);  // icon for un-bookmarked state
+        }
+    }
+
+    private void updateBookmarkStatus() {
+        if (isBookmarked) {
+            bookmarkImageView.setImageResource(R.drawable.bookmark_filled);  // Filled bookmark
+        } else {
+            bookmarkImageView.setImageResource(R.drawable.bookmark);  // Empty bookmark
+        }
+    }
+
+    private void updateFirebase() {
+        if (isBookmarked) {
+            // Add to Firebase Realtime Database as a bookmarked film
+            String filmId = databaseReference.push().getKey();
+            if (filmId != null) {
+                databaseReference.child(filmId).setValue(currentFilm).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(DetailActivity.this, "Bookmarked!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(DetailActivity.this, "Failed to bookmark", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        } else {
+            // Remove from Firebase Realtime Database
+            databaseReference.orderByChild("title").equalTo(currentFilm.getTitle()).get()
+                    .addOnSuccessListener(snapshot -> {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            ds.getRef().removeValue();
+                        }
+                        Toast.makeText(DetailActivity.this, "Bookmark removed", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
 
     private void showLanguageDialog() {
         String[] languages = {"English", "Tiếng Việt", "日本語", "中文", "Русский"};

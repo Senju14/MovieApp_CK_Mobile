@@ -38,4 +38,13 @@
         app:layout_constraintTop_toBottomOf="@id/tvMovieTitle"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/btnRate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rate this Movie"
+        app:layout_constraintStart_toStartOf="@id/tvMovieTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvMovieDescription"
+        android:layout_marginTop="8dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,6 +10,7 @@ public class Film implements Serializable {
     private String Time;
     private String Trailer;
     private int Imdb;
+
     private int Year;
     private ArrayList<String> Genre;
     private ArrayList<Cast> Casts;

@@ -47,14 +47,16 @@ public class FavoritesActivity extends AppCompatActivity {
         rvFavorites = findViewById( R.id.rvFavorites);
         rvFavorites.setLayoutManager(new LinearLayoutManager(this));
         favoriteMovies = new ArrayList<>();
-        favoritesAdapter = new FavoritesAdapter(favoriteMovies);
+        favoritesAdapter = new FavoritesAdapter(this, favoriteMovies);
         rvFavorites.setAdapter(favoritesAdapter);
 
         loadFavoriteMovies();
+
     }
 
+
     private void loadFavoriteMovies() {
-        DatabaseReference favoritesRef = FirebaseDatabase.getInstance().getReference("favorites");
+        DatabaseReference favoritesRef = FirebaseDatabase.getInstance().getReference("bookmarks");
         favoritesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -71,8 +73,11 @@ public class FavoritesActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Handle error
+                Log.e("FavoritesActivity", "Error loading favorite movies: " + error.getMessage());
             }
         });
     }
+
+
 }
 

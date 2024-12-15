@@ -162,8 +162,8 @@ public class MainActivity extends AppCompatActivity {
                         });
                     }
                 } else if (id == R.id.explorer) {
-                    // Handle explorer selection
-
+                    Intent intent = new Intent(MainActivity.this, ShowtimesActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.favorites) {
                     Intent intent = new Intent(MainActivity.this, FavoritesActivity.class);
                     startActivity(intent);

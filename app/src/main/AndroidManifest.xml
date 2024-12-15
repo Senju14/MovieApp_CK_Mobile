@@ -22,7 +22,13 @@
             android:name=".Activities.EditProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".Activities.RatingActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.VerifyTicketActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.ShowtimesActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.ProfileActivity"
