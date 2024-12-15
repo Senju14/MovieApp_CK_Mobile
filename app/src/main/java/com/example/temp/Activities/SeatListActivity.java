@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -104,7 +105,7 @@ public class SeatListActivity extends AppCompatActivity {
                 intent.putExtra("selectedSeats", selectedSeats);
                 intent.putExtra("price", price);
                 intent.putExtra("discount", discount);
-
+                Log.d("Test gia tien", "result" + price);
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
