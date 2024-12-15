@@ -144,11 +144,11 @@
                     android:layout_width="80dp"
                     android:layout_height="60dp"
                     android:id="@+id/spending"
-                    android:text="413"
+                    android:text="480000"
                     android:gravity="center"
                     android:textAlignment="center"
                     android:textColor="@color/lavender"
-                    android:textSize="26sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"/>
 
                 <TextView
