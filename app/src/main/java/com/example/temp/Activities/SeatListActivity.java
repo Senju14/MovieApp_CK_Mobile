@@ -117,7 +117,7 @@ public class SeatListActivity extends AppCompatActivity {
                 intent.putExtra("selectedSeats", selectedSeats);
                 intent.putExtra("price", price);
                 intent.putExtra("discount", discount);
-
+                Log.d("Test gia tien", "result" + price);
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "Failed to retrieve user data", Toast.LENGTH_SHORT).show();
