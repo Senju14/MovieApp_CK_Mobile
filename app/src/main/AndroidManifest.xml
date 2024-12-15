@@ -25,6 +25,9 @@
             android:name=".Activities.ProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".Activities.FavoritesActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.IntroActivity"
             android:exported="true">
             <intent-filter>
@@ -35,6 +38,9 @@
         </activity>
         <activity
             android:name=".Activities.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.BookingHistoryActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.SignupActivity"

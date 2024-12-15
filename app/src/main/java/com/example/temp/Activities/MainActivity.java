@@ -48,6 +48,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
+import com.example.temp.Activities.BookingHistoryActivity;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,11 +165,11 @@ public class MainActivity extends AppCompatActivity {
                     // Handle explorer selection
 
                 } else if (id == R.id.favorites) {
-                    // Handle favorites selection
-
-
+                    Intent intent = new Intent(MainActivity.this, FavoritesActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.cart) {
-                    // Handle cart selection
+                    Intent intent = new Intent(MainActivity.this, BookingHistoryActivity.class);
+                    startActivity(intent);
                 }
 
             }

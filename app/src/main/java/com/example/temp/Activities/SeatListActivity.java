@@ -79,15 +79,7 @@ public class SeatListActivity extends AppCompatActivity {
             return;
         }
 
-        if (selectedDate == null || selectedDate.isEmpty()) {
-            Toast.makeText(this, "Please select a date", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-        if (selectedTime == null || selectedTime.isEmpty()) {
-            Toast.makeText(this, "Please select a time", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         // Get current user
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -124,6 +116,7 @@ public class SeatListActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
     private void initSeatsList() {

@@ -26,6 +26,7 @@ public class ResultActivity extends AppCompatActivity {
         txtResult = findViewById(R.id.result);
         Intent intent = getIntent();
         txtResult.setText(intent.getStringExtra("result"));
+        btnHome = findViewById(R.id.btnHome);
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

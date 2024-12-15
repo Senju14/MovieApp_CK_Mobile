@@ -191,7 +191,7 @@ public class ConfirmationActivity extends AppCompatActivity {
 //        intent.putExtra("totalAmount", totalAmount);
 //        startActivity(intent);
 //    }
-
+//
 //    private void openZaloPayScreen(String filmName, double totalAmount) {
 //        Intent intent = new Intent(this, ZaloPayPaymentActivity.class);
 //        intent.putExtra("filmName", filmName);
