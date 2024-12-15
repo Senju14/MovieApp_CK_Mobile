@@ -41,7 +41,7 @@ public class SeatListActivity extends AppCompatActivity {
     private int number = 0;
 
     private ArrayList<String> selectedSeats = new ArrayList<>();
-    private double discount = 10.0;
+    private double discount = 0.1;
     private String filmName;
     private String selectedDate;
     private String selectedTime;

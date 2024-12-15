@@ -86,7 +86,18 @@ public class ConfirmationActivity extends AppCompatActivity {
 //                    selectedTime, selectedSeats, price, discount);
 //
 //        });
-        Double total =  (price - discount)*24000;
+
+
+//        Log.d("test", "discount: " + discount);
+//        Log.d("test", "price: " + price);
+//        Log.d("test", "price1: " + price1);
+//        Log.d("test", "price1 * discount: " + price1*discount);
+
+        Double price1 = price * 24000;
+        Double discount1 = price1 * discount;
+
+        Double total =  price1 - discount1;
+        Log.d("test", "total: " + total);
         String totalString = String.format("%.0f", total);
 
         binding.continueBtn.setOnClickListener(new View.OnClickListener() {
@@ -207,6 +218,7 @@ public class ConfirmationActivity extends AppCompatActivity {
                                        ArrayList<String> selectedSeats,
                                        double price, double discount) {
         NumberFormat vnFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
         double total = price - discount;
 
         binding.nameTxt.setText("Name: " + name);
@@ -217,8 +229,8 @@ public class ConfirmationActivity extends AppCompatActivity {
         binding.seatsTxt.setText("Seats: " + selectedSeats.toString());
 
         binding.priceTxt.setText("Price: " + vnFormat.format(price * 24000));
-        binding.discountTxt.setText("Discount: " + vnFormat.format(discount * 24000));
-        binding.totalTxt.setText("Total: " + vnFormat.format(total * 24000));
+        binding.discountTxt.setText("Discount: " + vnFormat.format((price * 24000) * discount));
+        binding.totalTxt.setText("Total: " + vnFormat.format((price * 24000) - (price * 24000) * discount));
 
 
         Film film = (Film) getIntent().getSerializableExtra("film");
