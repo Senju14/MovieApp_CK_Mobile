@@ -2,6 +2,9 @@ package com.example.temp.Activities;
 
 import android.graphics.Movie;
 import android.os.Bundle;
+import android.view.View;
+import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
+import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,16 @@ public class FavoritesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
+
+        // Liên kết nút back (ImageView)
+        View backImg = findViewById(R.id.backImg);
+        backImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Quay lại màn hình trước đó
+                finish();
+            }
+        });
 
         rvFavorites = findViewById( R.id.rvFavorites);
         rvFavorites.setLayoutManager(new LinearLayoutManager(this));
