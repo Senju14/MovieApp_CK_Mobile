@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.CheckBox;
+import android.text.InputType;
 
 import com.example.temp.HelperClass;
 import com.example.temp.R;
@@ -21,6 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     EditText signupName, signupUsername, signupEmail, signupPassword, signupRetypePassword;
     TextView loginRedirectText;
     Button signupButton;
+    CheckBox showPasswordCheckbox;  // Declare the CheckBox
     FirebaseAuth auth;
     FirebaseDatabase database;
     DatabaseReference reference;
@@ -34,12 +37,26 @@ public class SignupActivity extends AppCompatActivity {
         signupEmail = findViewById(R.id.signup_email);
         signupUsername = findViewById(R.id.signup_username);
         signupPassword = findViewById(R.id.signup_password);
-        signupRetypePassword = findViewById(R.id.signup_retype_password); // New EditText
+        signupRetypePassword = findViewById(R.id.signup_retype_password);
         loginRedirectText = findViewById(R.id.loginRedirectText);
         signupButton = findViewById(R.id.signup_button);
+        showPasswordCheckbox = findViewById(R.id.show_password_checkbox);  // Initialize CheckBox
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+        // Password visibility toggle logic
+        showPasswordCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // If checked, set password inputs to plain text
+                signupPassword.setInputType(InputType.TYPE_CLASS_TEXT);
+                signupRetypePassword.setInputType(InputType.TYPE_CLASS_TEXT);
+            } else {
+                // If unchecked, set password inputs to password type
+                signupPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                signupRetypePassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+        });
 
         signupButton.setOnClickListener(view -> {
             String name = signupName.getText().toString().trim();

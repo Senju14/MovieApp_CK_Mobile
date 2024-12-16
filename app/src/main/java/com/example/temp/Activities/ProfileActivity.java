@@ -183,7 +183,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Update discount in Firebase
         usersRef.child("discount").setValue(discount).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Toast.makeText(ProfileActivity.this, "Discount saved successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, "Enjoy the movie!", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(ProfileActivity.this, "Failed to save discount: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }

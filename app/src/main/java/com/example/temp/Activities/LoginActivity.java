@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.CheckBox;
+import android.text.InputType;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText loginUsername, loginPassword;
     Button loginButton;
     TextView signupRedirectText;
+    CheckBox showPasswordCheckbox;  // Declare the CheckBox
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +40,24 @@ public class LoginActivity extends AppCompatActivity {
         loginPassword = findViewById(R.id.login_password);
         loginButton = findViewById(R.id.login_button);
         signupRedirectText = findViewById(R.id.signupRedirectText);
+        showPasswordCheckbox = findViewById(R.id.show_password_checkbox);  // Initialize CheckBox
+
+        // Password visibility toggle logic
+        showPasswordCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // If checked, set password input to plain text
+                loginPassword.setInputType(InputType.TYPE_CLASS_TEXT);
+            } else {
+                // If unchecked, set password input to password type
+                loginPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            }
+        });
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!validateUsername() | !validatePassword()) {
-
+                if (!validateUsername() || !validatePassword()) {
+                    // Do nothing if validation fails
                 } else {
                     checkUser();
                 }
@@ -56,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
 
     public Boolean validateUsername() {
@@ -70,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public Boolean validatePassword(){
+    public Boolean validatePassword() {
         String val = loginPassword.getText().toString();
         if (val.isEmpty()) {
             loginPassword.setError("Password cannot be empty");
@@ -80,7 +94,6 @@ public class LoginActivity extends AppCompatActivity {
             return true;
         }
     }
-
 
     public void checkUser() {
         String userUsername = loginUsername.getText().toString().trim();
@@ -128,5 +141,4 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-
 }
