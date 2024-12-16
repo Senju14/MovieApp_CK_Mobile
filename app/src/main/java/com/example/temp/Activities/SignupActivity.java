@@ -18,7 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class SignupActivity extends AppCompatActivity {
 
-    EditText signupName, signupUsername, signupEmail, signupPassword;
+    EditText signupName, signupUsername, signupEmail, signupPassword, signupRetypePassword;
     TextView loginRedirectText;
     Button signupButton;
     FirebaseAuth auth;
@@ -34,47 +34,59 @@ public class SignupActivity extends AppCompatActivity {
         signupEmail = findViewById(R.id.signup_email);
         signupUsername = findViewById(R.id.signup_username);
         signupPassword = findViewById(R.id.signup_password);
+        signupRetypePassword = findViewById(R.id.signup_retype_password); // New EditText
         loginRedirectText = findViewById(R.id.loginRedirectText);
         signupButton = findViewById(R.id.signup_button);
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String name = signupName.getText().toString().trim();
-                String email = signupEmail.getText().toString().trim();
-                String username = signupUsername.getText().toString().trim();
-                String password = signupPassword.getText().toString().trim();
+        signupButton.setOnClickListener(view -> {
+            String name = signupName.getText().toString().trim();
+            String email = signupEmail.getText().toString().trim();
+            String username = signupUsername.getText().toString().trim();
+            String password = signupPassword.getText().toString().trim();
+            String retypePassword = signupRetypePassword.getText().toString().trim();
 
-                if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(SignupActivity.this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                String uid = auth.getCurrentUser().getUid();
-                                reference = database.getReference("users").child(uid);
-
-                                HelperClass helperClass = new HelperClass(name, email, username, password);
-                                reference.setValue(helperClass).addOnCompleteListener(dbTask -> {
-                                    if (dbTask.isSuccessful()) {
-                                        Toast.makeText(SignupActivity.this, "Signup successful!", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        Toast.makeText(SignupActivity.this, "Database error: " + dbTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            } else {
-                                Toast.makeText(SignupActivity.this, "Authentication error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+            // Check if any field is empty
+            if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty() || retypePassword.isEmpty()) {
+                Toast.makeText(SignupActivity.this, "Please fill all fields!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            // Check if passwords match
+            if (!password.equals(retypePassword)) {
+                Toast.makeText(SignupActivity.this, "Passwords do not match!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Check password length (minimum 6 characters)
+            if (password.length() < 6) {
+                Toast.makeText(SignupActivity.this, "Password must be at least 6 characters long!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            String uid = auth.getCurrentUser().getUid();
+                            reference = database.getReference("users").child(uid);
+
+                            HelperClass helperClass = new HelperClass(name, email, username, password);
+                            reference.setValue(helperClass).addOnCompleteListener(dbTask -> {
+                                if (dbTask.isSuccessful()) {
+                                    Toast.makeText(SignupActivity.this, "Signup successful!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(SignupActivity.this, "Database error: " + dbTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(SignupActivity.this, "Authentication error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
 
         loginRedirectText.setOnClickListener(view -> {

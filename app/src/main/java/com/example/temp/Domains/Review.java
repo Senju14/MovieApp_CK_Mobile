@@ -4,9 +4,11 @@ public class Review {
     private float rating;
     private String review;
 
+
     public Review() {
         // Default constructor
     }
+
 
     public Review(float rating, String review) {
         this.rating = rating;

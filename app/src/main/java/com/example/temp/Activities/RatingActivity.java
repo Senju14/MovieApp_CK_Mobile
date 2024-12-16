@@ -11,12 +11,22 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.temp.Adapters.ReviewAdapter;
 import com.example.temp.Domains.Review;
 import com.example.temp.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RatingActivity extends AppCompatActivity {
 
@@ -63,7 +73,55 @@ public class RatingActivity extends AppCompatActivity {
                 Toast.makeText(RatingActivity.this, "Please write a review!", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+        addFakeReviews(movieTitle);
+        loadReviews(movieTitle);
+
     }
+
+    // Dữ liệu bình luận mẫu
+    private void addFakeReviews(String movieTitle) {
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews").child(movieTitle);
+
+        reviewsRef.push().setValue(new Review(4.5f, "Amazing movie! Highly recommended."));
+        reviewsRef.push().setValue(new Review(3.0f, "It was okay, not great."));
+        reviewsRef.push().setValue(new Review(5.0f, "Masterpiece! The best I've ever seen."));
+        reviewsRef.push().setValue(new Review(2.0f, "Disappointing, expected more."));
+        reviewsRef.push().setValue(new Review(4.0f, "Good movie with some great moments."));
+    }
+
+    private void loadReviews(String movieTitle) {
+        DatabaseReference reviewsRef = FirebaseDatabase.getInstance().getReference("reviews").child(movieTitle);
+        reviewsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Review> reviewList = new ArrayList<>();
+                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                    Review review = reviewSnapshot.getValue(Review.class);
+                    if (review != null) {
+                        reviewList.add(review);
+                    }
+                }
+
+                RecyclerView rvReviews = findViewById(R.id.rvReviews);
+                rvReviews.setLayoutManager(new LinearLayoutManager(RatingActivity.this));
+                rvReviews.setAdapter(new ReviewAdapter(reviewList));
+
+                if (reviewList.isEmpty()) {
+                    Toast.makeText(RatingActivity.this, "No reviews available.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("RatingActivity", "Failed to load reviews: " + error.getMessage());
+            }
+        });
+    }
+
+
+
 
     private void submitReview(String movieTitle, float rating, String review) {
         // Firebase Database reference

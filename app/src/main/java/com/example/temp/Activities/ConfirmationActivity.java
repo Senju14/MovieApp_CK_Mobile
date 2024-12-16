@@ -20,8 +20,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
@@ -41,6 +39,7 @@ public class ConfirmationActivity extends AppCompatActivity {
 
     private ActivityConfirmationBinding binding;
     private DatabaseReference mDatabase;
+    private double discount = 0.0; // Default discount
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,64 +50,104 @@ public class ConfirmationActivity extends AppCompatActivity {
         // Initialize Firebase Database
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-
         // Get data from Intent
         String name = getIntent().getStringExtra("name");
         String username = getIntent().getStringExtra("username");
         String filmName = getIntent().getStringExtra("filmName");
         String selectedDate = getIntent().getStringExtra("selectedDate");
         String selectedTime = getIntent().getStringExtra("selectedTime");
-//        Log.d("ConfirmationActivity", "Date: " + selectedDate);
-//        Log.d("ConfirmationActivity", "Time: " + selectedTime);
         ArrayList<String> selectedSeats = getIntent().getStringArrayListExtra("selectedSeats");
         double price = getIntent().getDoubleExtra("price", 0.0);
-        double discount = getIntent().getDoubleExtra("discount", 0.0);
-//        Log.d("Test gia tien", "result" + price);
 
-        // Display booking details
-        displayBookingDetails(name, username, filmName, selectedDate,
-                selectedTime, selectedSeats, price, discount);
+        // Fetch discount from Firebase
+        fetchDiscountAndDisplay(name, username, filmName, selectedDate, selectedTime, selectedSeats, price);
 
         // Handle back button
         binding.backBtn.setOnClickListener(v -> {
             finish();
         });
 
-        StrictMode.ThreadPolicy policy = new
-                StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         ZaloPaySDK.init(2553, Environment.SANDBOX);
 
-        Double price1 = price * 24000;
-        Double discount1 = price1 * discount;
-
-        Double total =  price1 - discount1;
-        Log.d("test", "total: " + total);
-        String totalString = String.format("%.0f", total);
-
         binding.continueBtn.setOnClickListener(v -> showPaymentOptions(
-                name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount
+                name, username, filmName, selectedDate, selectedTime, selectedSeats, price
         ));
-
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        ZaloPaySDK.getInstance().onResult(intent);
+    private void fetchDiscountAndDisplay(String name, String username, String filmName,
+                                         String selectedDate, String selectedTime,
+                                         ArrayList<String> selectedSeats, double price) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = currentUser.getUid();
+        DatabaseReference discountRef = mDatabase.child("users").child(userId).child("discount");
+
+        discountRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    discount = snapshot.getValue(Double.class); // Get discount value from Firebase
+                } else {
+                    discount = 0.0; // Default to no discount
+                }
+                // Update UI with booking details
+                displayBookingDetails(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(ConfirmationActivity.this, "Failed to fetch discount: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                discount = 0.0; // Default to no discount
+                displayBookingDetails(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
+            }
+        });
+    }
+
+    private void displayBookingDetails(String name, String username, String filmName,
+                                       String selectedDate, String selectedTime,
+                                       ArrayList<String> selectedSeats, double price, double discount) {
+        NumberFormat vnFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
+        double priceInVND = price * 24000; // Convert price to VND
+        double discountAmount = priceInVND * discount;
+        double total = priceInVND - discountAmount;
+
+        binding.nameTxt.setText("Name: " + name);
+        binding.usernameTxt.setText("Email: " + username);
+        binding.titleTxt.setText("Film: " + filmName);
+        binding.dateTxt.setText("Date: " + selectedDate);
+        binding.timeTxt.setText("Time: " + selectedTime);
+        binding.seatsTxt.setText("Seats: " + selectedSeats.toString());
+
+        binding.priceTxt.setText("Price: " + vnFormat.format(priceInVND));
+        binding.discountTxt.setText("Discount: " + vnFormat.format(discountAmount));
+        binding.totalTxt.setText("Total: " + vnFormat.format(total));
+
+        Film film = (Film) getIntent().getSerializableExtra("film");
+        if (film != null) {
+            binding.titleTxt.setText("Film: " + film.getTitle());
+            Glide.with(this)
+                    .load(film.getPoster())
+                    .into(binding.filmPic);
+        }
     }
 
     private void showPaymentOptions(String name, String username, String filmName,
                                     String selectedDate, String selectedTime,
-                                    ArrayList<String> selectedSeats, double price, double discount) {
+                                    ArrayList<String> selectedSeats, double price) {
         BottomSheetDialog paymentDialog = new BottomSheetDialog(this);
         paymentDialog.setContentView(R.layout.dialog_payment_options);
 
         paymentDialog.findViewById(R.id.zalopayOption).setOnClickListener(v -> {
             paymentDialog.dismiss();
             saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-            processZaloPayPayment(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
         });
 
         paymentDialog.findViewById(R.id.cashOption).setOnClickListener(v -> {
@@ -120,95 +159,9 @@ public class ConfirmationActivity extends AppCompatActivity {
         paymentDialog.show();
     }
 
-    private void processZaloPayPayment(String name, String username, String filmName,
-                                       String selectedDate, String selectedTime,
-                                       ArrayList<String> selectedSeats, double price, double discount) {
-        Double price1 = price * 24000;
-        Double discount1 = price1 * discount;
-        Double total = price1 - discount1;
-        String totalString = String.format("%.0f", total);
-
-        CreateOrder orderApi = new CreateOrder();
-        try {
-            JSONObject data = orderApi.createOrder(totalString);
-            String code = data.getString("return_code");
-
-            if (code.equals("1")) {
-                String token = data.getString("zp_trans_token");
-                ZaloPaySDK.getInstance().payOrder(this, token, "demozpdk://app", new PayOrderListener() {
-                    @Override
-                    public void onPaymentSucceeded(String zpTransToken, String appTransId, String zpTransId) {
-
-                        saveBookingToFirebase(name, username, filmName, selectedDate, selectedTime, selectedSeats, price, discount);
-
-                        Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
-                        intent.putExtra("result", "Payment successful");
-                        intent.putExtra("name", name);
-                        intent.putExtra("username", username);
-                        intent.putExtra("filmName", filmName);
-                        intent.putExtra("date", selectedDate);
-                        intent.putExtra("time", selectedTime);
-                        intent.putStringArrayListExtra("seats", selectedSeats);
-                        intent.putExtra("totalPrice", total);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onPaymentCanceled(String s, String s1) {
-                        Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
-                        intent.putExtra("result", "Payment Canceled");
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onPaymentError(ZaloPayError zaloPayError, String s, String s1) {
-                        Intent intent = new Intent(ConfirmationActivity.this, ResultActivity.class);
-                        intent.putExtra("result", "Payment Error");
-                        startActivity(intent);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error when creating ZaloPay order", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void displayBookingDetails(String name, String username, String filmName,
-                                       String selectedDate, String selectedTime,
-                                       ArrayList<String> selectedSeats,
-                                       double price, double discount) {
-        NumberFormat vnFormat = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-
-        double total = price - discount;
-
-        binding.nameTxt.setText("Name: " + name);
-        binding.usernameTxt.setText("Email: " + username);
-        binding.titleTxt.setText("Film: " + filmName);
-        binding.dateTxt.setText("Date: " + selectedDate);
-        binding.timeTxt.setText("Time: " + selectedTime);
-        binding.seatsTxt.setText("Seats: " + selectedSeats.toString());
-
-        binding.priceTxt.setText("Price: " + vnFormat.format(price * 24000));
-        binding.discountTxt.setText("Discount: " + vnFormat.format((price * 24000) * discount));
-        binding.totalTxt.setText("Total: " + vnFormat.format((price * 24000) - (price * 24000) * discount));
-
-
-        Film film = (Film) getIntent().getSerializableExtra("film");
-
-        if (film != null) {
-            binding.titleTxt.setText("Film: " + film.getTitle());
-            Glide.with(this)
-                    .load(film.getPoster()) // URL hoặc resource của poster
-                    .into(binding.filmPic); // ID của ImageView hiển thị poster
-        }
-
-    }
-
     private void saveBookingToFirebase(String name, String username, String filmName,
                                        String selectedDate, String selectedTime,
-                                       ArrayList<String> selectedSeats,
-                                       double price, double discount) {
+                                       ArrayList<String> selectedSeats, double price, double discount) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
@@ -218,17 +171,16 @@ public class ConfirmationActivity extends AppCompatActivity {
         DatabaseReference bookingsRef = mDatabase.child("bookings");
         DatabaseReference usersRef = mDatabase.child("users");
 
-        // Generate unique booking ID
         String bookingId = bookingsRef.push().getKey();
         if (bookingId == null) return;
 
         String userEmail = currentUser.getEmail();
         String userId = currentUser.getUid();
-        double total = (price - discount)*2400;
-
+        double priceInVND = price * 24000;
+        double discountAmount = priceInVND * discount;
+        double total = priceInVND - discountAmount;
         int points = (int) (total / 1000);
 
-        // Booking data
         Map<String, Object> bookingData = new HashMap<>();
         bookingData.put("name", name);
         bookingData.put("username", username);
@@ -236,44 +188,18 @@ public class ConfirmationActivity extends AppCompatActivity {
         bookingData.put("selectedDate", selectedDate);
         bookingData.put("selectedTime", selectedTime);
         bookingData.put("selectedSeats", selectedSeats);
-        bookingData.put("price", price);
-        bookingData.put("discount", discount);
+        bookingData.put("price", priceInVND);
+        bookingData.put("discount", discountAmount);
         bookingData.put("total", total);
         bookingData.put("userId", userId);
         bookingData.put("userEmail", userEmail);
 
-        // Save booking
         bookingsRef.child(bookingId).setValue(bookingData)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Directly to payment", Toast.LENGTH_SHORT).show();
-
-                    // Add booking reference to user's profile
                     usersRef.child(userId).child("bookings").child(bookingId).setValue(true);
-                    usersRef.child(userId).child("points").runTransaction(new Transaction.Handler() {
-                        @Override
-                        public Transaction.Result doTransaction(MutableData currentData) {
-                            Integer currentPoints = currentData.getValue(Integer.class);
-                            if (currentPoints == null) {
-                                currentPoints = 0;
-                            }
-                            currentData.setValue(currentPoints + points);
-                            return Transaction.success(currentData);
-                        }
-
-                        @Override
-                        public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot currentData) {
-                            if (databaseError != null) {
-                                Toast.makeText(getApplicationContext(), "Failed to update points: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Integer updatedPoints = currentData.getValue(Integer.class);
-                                Toast.makeText(getApplicationContext(), "Points updated: " + updatedPoints, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
-                    // Optional: Navigate to a success or next screen
-                    // startActivity(new Intent(this, SomeNextActivity.class));
-                     finish();
+                    usersRef.child(userId).child("points").setValue(points);
+                    Toast.makeText(this, "Booking saved successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to save booking: " + e.getMessage(), Toast.LENGTH_LONG).show();

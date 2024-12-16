@@ -56,7 +56,28 @@ public class ProfileActivity extends AppCompatActivity {
                 passUserData();
             }
         });
+
+        Button signOutButton = findViewById(R.id.signOutButton);
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+
     }
+
+    private void signOut() {
+        FirebaseAuth.getInstance().signOut(); // Đăng xuất khỏi Firebase
+        Toast.makeText(ProfileActivity.this, "Signed out successfully", Toast.LENGTH_SHORT).show();
+
+        // Chuyển sang màn hình đăng nhập
+        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa ngăn xếp
+        startActivity(intent);
+        finish();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -82,36 +103,6 @@ public class ProfileActivity extends AppCompatActivity {
         profilePassword.setText(passwordUser);
 
         getUserPoints();
-        getUserSpending();
-    }
-
-    private void getUserSpending() {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
-
-        usersRef.child("spending").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                TextView spendingTextView = findViewById(R.id.spending);
-
-                if (snapshot.exists()) {
-                    Double spending = snapshot.getValue(Double.class);  // Assuming spending is stored as a Double
-                    if (spending != null) {
-                        // Display the spending amount in the TextView
-                        spendingTextView.setText(String.format("%.2f", spending));  // Format to 2 decimal places
-                    } else {
-                        spendingTextView.setText("0.00");
-                    }
-                } else {
-                    spendingTextView.setText("0.00");
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ProfileActivity.this, "Failed to load spending: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
 
@@ -126,14 +117,33 @@ public class ProfileActivity extends AppCompatActivity {
                     Integer points = snapshot.getValue(Integer.class);
                     if (points != null) {
                         // Hiển thị điểm vào TextView
-                        profilePoints.setText(points +"");
+                        profilePoints.setText(points + "");
+
+                        // Tính Spending từ points
+                        int spending = points * 10000;
+
+                        // Hiển thị Spending
+                        TextView spendingTextView = findViewById(R.id.spending);
+                        spendingTextView.setText(String.valueOf(spending));
+
+                        // Cập nhật rank và discount
                         updateDiscount(points);
                     } else {
                         profilePoints.setText("0");
+
+                        // Hiển thị Spending mặc định
+                        TextView spendingTextView = findViewById(R.id.spending);
+                        spendingTextView.setText("0");
+
                         updateDiscount(0);
                     }
                 } else {
                     profilePoints.setText("0");
+
+                    // Hiển thị Spending mặc định
+                    TextView spendingTextView = findViewById(R.id.spending);
+                    spendingTextView.setText("0");
+
                     updateDiscount(0);
                 }
             }
@@ -144,6 +154,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
 
     // Function to update discount and rank based on points
     private void updateDiscount(int points) {
@@ -165,8 +176,18 @@ public class ProfileActivity extends AppCompatActivity {
         // Display discount in rank TextView
         rankText.setText(rank + " (" + discount * 100 + "% discount)");  // Set rank with discount
 
-        // Optional: You can also display the discount as Toast or elsewhere if needed
-        Toast.makeText(ProfileActivity.this, "Your discount: " + discount * 100 + "%", Toast.LENGTH_SHORT).show();
+        // Push discount to Firebase
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+        // Update discount in Firebase
+        usersRef.child("discount").setValue(discount).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(ProfileActivity.this, "Discount saved successfully!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(ProfileActivity.this, "Failed to save discount: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Truyền discount qua Intent sang ConfirmationActivity
         Intent intent = new Intent(ProfileActivity.this, ConfirmationActivity.class);
