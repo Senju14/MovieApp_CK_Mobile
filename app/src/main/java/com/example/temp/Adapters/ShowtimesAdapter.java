@@ -56,7 +56,25 @@ public class ShowtimesAdapter extends RecyclerView.Adapter<ShowtimesAdapter.Show
         holder.ivNotification.setOnClickListener(v -> {
             setNotificationForShowtime(holder.itemView.getContext(), showtime);
         });
+
+        // Xử lý sự kiện nhấn nút bản đồ
+        holder.ivMap.setOnClickListener(v -> openMap(holder.itemView.getContext(), location));
     }
+
+    private void openMap(Context context, String location) {
+        // Tạo URI cho Google Maps
+        String uri = "geo:0,0?q=" + location;
+        Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uri));
+        intent.setPackage("com.google.android.apps.maps");
+
+        // Kiểm tra nếu thiết bị có ứng dụng Google Maps
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        } else {
+            Toast.makeText(context, "Google Maps is not installed", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     public int getItemCount() {
@@ -123,7 +141,7 @@ public class ShowtimesAdapter extends RecyclerView.Adapter<ShowtimesAdapter.Show
 
     public static class ShowtimeViewHolder extends RecyclerView.ViewHolder {
         TextView tvMovieName, tvTheaterName, tvSchedule;
-        ImageView ivNotification;
+        ImageView ivNotification, ivMap;
 
         public ShowtimeViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -131,6 +149,7 @@ public class ShowtimesAdapter extends RecyclerView.Adapter<ShowtimesAdapter.Show
             tvTheaterName = itemView.findViewById(R.id.tvTheaterName);
             tvSchedule = itemView.findViewById(R.id.tvSchedule);
             ivNotification = itemView.findViewById(R.id.ivNotification);
+            ivMap = itemView.findViewById(R.id.ivMap);
         }
     }
 }
