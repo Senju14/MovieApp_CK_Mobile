@@ -88,6 +88,12 @@
             android:name=".Activities.MainActivity"
             android:exported="false" />
         <activity
+            android:name=".Activities.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.ConfirmationActivity"
             android:exported="true"
             android:label="Merchant Demo"

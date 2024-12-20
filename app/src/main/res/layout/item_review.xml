@@ -5,6 +5,24 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <!-- Avatar và thông tin user -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_avatar_placeholder" />
+
+    </LinearLayout>
+
+    <!-- Đánh giá và bình luận chính -->
     <TextView
         android:id="@+id/tvRating"
         android:layout_width="wrap_content"
@@ -12,7 +30,8 @@
         android:text="4.5"
         android:textStyle="bold"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:paddingBottom="4dp" />
 
     <TextView
         android:id="@+id/tvComment"
@@ -20,5 +39,56 @@
         android:layout_height="wrap_content"
         android:text="This movie was amazing!"
         android:textSize="14sp"
-        android:paddingTop="4dp" />
+        android:paddingBottom="8dp" />
+
+    <!-- Các bình luận phụ -->
+    <LinearLayout
+        android:id="@+id/layoutSubComments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp" />
+
+    <!-- Nút Like và Comment -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvLike"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="Like"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
+            android:id="@+id/tvComment1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="Comment"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- Nút chia sẻ -->
+    <ImageView
+        android:id="@+id/ivShare"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="end"
+        android:src="@drawable/ic_share" />
 </LinearLayout>

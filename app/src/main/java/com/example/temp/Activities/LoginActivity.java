@@ -31,6 +31,8 @@ public class LoginActivity extends AppCompatActivity {
     TextView signupRedirectText;
     CheckBox showPasswordCheckbox;  // Declare the CheckBox
 
+    Button forgotPasswordButton;  // Declare Forgot Password Button
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.login_button);
         signupRedirectText = findViewById(R.id.signupRedirectText);
         showPasswordCheckbox = findViewById(R.id.show_password_checkbox);  // Initialize CheckBox
+        forgotPasswordButton = findViewById(R.id.forgot_password_button);  // Initialize Forgot Password Button
 
         // Password visibility toggle logic
         showPasswordCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -51,6 +54,12 @@ public class LoginActivity extends AppCompatActivity {
                 // If unchecked, set password input to password type
                 loginPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             }
+        });
+
+        // Forgot Password button click listener
+        forgotPasswordButton.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
         loginButton.setOnClickListener(new View.OnClickListener() {
