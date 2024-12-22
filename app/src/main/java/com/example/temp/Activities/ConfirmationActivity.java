@@ -159,6 +159,53 @@ public class ConfirmationActivity extends AppCompatActivity {
         paymentDialog.show();
     }
 
+//    private void saveBookingToFirebase(String name, String username, String filmName,
+//                                       String selectedDate, String selectedTime,
+//                                       ArrayList<String> selectedSeats, double price, double discount) {
+//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        if (currentUser == null) {
+//            Toast.makeText(this, "User not authenticated", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        DatabaseReference bookingsRef = mDatabase.child("bookings");
+//        DatabaseReference usersRef = mDatabase.child("users");
+//
+//        String bookingId = bookingsRef.push().getKey();
+//        if (bookingId == null) return;
+//
+//        String userEmail = currentUser.getEmail();
+//        String userId = currentUser.getUid();
+//        double priceInVND = price * 24000;
+//        double discountAmount = priceInVND * discount;
+//        double total = priceInVND - discountAmount;
+//        int points = (int) (total / 1000);
+//
+//        Map<String, Object> bookingData = new HashMap<>();
+//        bookingData.put("name", name);
+//        bookingData.put("username", username);
+//        bookingData.put("filmName", filmName);
+//        bookingData.put("selectedDate", selectedDate);
+//        bookingData.put("selectedTime", selectedTime);
+//        bookingData.put("selectedSeats", selectedSeats);
+//        bookingData.put("price", priceInVND);
+//        bookingData.put("discount", discountAmount);
+//        bookingData.put("total", total);
+//        bookingData.put("userId", userId);
+//        bookingData.put("userEmail", userEmail);
+//
+//        bookingsRef.child(bookingId).setValue(bookingData)
+//                .addOnSuccessListener(aVoid -> {
+//                    usersRef.child(userId).child("bookings").child(bookingId).setValue(true);
+//                    usersRef.child(userId).child("points").setValue(points);
+//                    Toast.makeText(this, "Booking saved successfully!", Toast.LENGTH_SHORT).show();
+//                    finish();
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(this, "Failed to save booking: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//                });
+//    }
+
     private void saveBookingToFirebase(String name, String username, String filmName,
                                        String selectedDate, String selectedTime,
                                        ArrayList<String> selectedSeats, double price, double discount) {
@@ -197,12 +244,41 @@ public class ConfirmationActivity extends AppCompatActivity {
         bookingsRef.child(bookingId).setValue(bookingData)
                 .addOnSuccessListener(aVoid -> {
                     usersRef.child(userId).child("bookings").child(bookingId).setValue(true);
-                    usersRef.child(userId).child("points").setValue(points);
-                    Toast.makeText(this, "Booking saved successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
+
+                    usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            int currentPoints = 0;
+                            double currentTotalSpent = 0;
+
+                            if (snapshot.hasChild("points")) {
+                                currentPoints = snapshot.child("points").getValue(Integer.class);
+                            }
+
+                            if (snapshot.hasChild("totalSpent")) {
+                                currentTotalSpent = snapshot.child("totalSpent").getValue(Double.class);
+                            }
+
+                            int updatedPoints = currentPoints + points;
+                            double updatedTotalSpent = currentTotalSpent + total;
+
+                            Map<String, Object> updates = new HashMap<>();
+                            updates.put("points", updatedPoints);
+                            updates.put("totalSpent", updatedTotalSpent);
+
+                            usersRef.child(userId).updateChildren(updates)
+                                    .addOnSuccessListener(unused -> Toast.makeText(ConfirmationActivity.this, "Booking saved successfully!", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e -> Toast.makeText(ConfirmationActivity.this, "Failed to update user data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
+                            finish();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(ConfirmationActivity.this, "Failed to fetch user data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to save booking: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to save booking: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 }
