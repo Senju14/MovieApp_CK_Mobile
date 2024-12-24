@@ -115,11 +115,8 @@ public class SeatListActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void initSeatsList() {
         Log.d("SeatListActivity", "initSeatsList() called");
-        // Set up time adapter with selection listener
         List<String> timeSlots = generateTimeSlots();
         TimeAdapter timeAdapter = new TimeAdapter(timeSlots, new TimeAdapter.OnTimeSelectedListener() {
 
@@ -130,9 +127,6 @@ public class SeatListActivity extends AppCompatActivity {
             }
 
         });
-
-//        Log.d("ngaày nè", "check ngày đi: " + selectedDate);
-//        Log.d("giờ nè", "check giờ đi: " + selectedTime);
         binding.TimeRecyclerview.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.TimeRecyclerview.setAdapter(timeAdapter);
@@ -146,81 +140,168 @@ public class SeatListActivity extends AppCompatActivity {
                 Log.d("SeatListActivity", "Selected Date: " + selectedDate);
             }
         });
-
         binding.dateRecyclerview.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.dateRecyclerview.setAdapter(dateAdapter);
-
-
         // Initialize the GridLayoutManager with 7 columns
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7);
-
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return 1; // Default to 1 span per item
-            }
-        });
 
         // Set the LayoutManager for the RecyclerView
         binding.seatRecyclerview.setLayoutManager(gridLayoutManager);
 
-        // Initialize the seat list
-        List<Seat> seatList = new ArrayList<>();
-        int numberSeats = 81; // Example number of seats
+        // Reference to Firebase Realtime Database
+        DatabaseReference seatsRef = FirebaseDatabase.getInstance().getReference("films")
+                .child(filmName).child("seats");
 
-        // Loop through and create Seat objects
-        for (int i = 0; i < numberSeats; i++) {
-            String seatName = "Seat " + (i + 1); // Generate seat name
-            Seat.SeatStatus seatStatus;
+        seatsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Seat> seatList = new ArrayList<>();
+                DataSnapshot snapshot = task.getResult();
 
-            // Set specific seats as unavailable based on their index
-            if (i == 2 || i == 20 || i == 33 || i == 41 || i == 50 || i == 72 || i == 73) {
-                seatStatus = Seat.SeatStatus.UNAVAILABLE;
+                // Loop through seats data
+                for (int i = 0; i < 81; i++) {
+                    String seatName = "Seat " + (i + 1);
+                    Seat.SeatStatus seatStatus = Seat.SeatStatus.AVAILABLE;
+
+                    // Check if the seat is already taken
+                    if (snapshot.child(seatName).exists()) {
+                        String status = snapshot.child(seatName).getValue(String.class);
+                        seatStatus = "TAKEN".equals(status) ? Seat.SeatStatus.UNAVAILABLE : Seat.SeatStatus.AVAILABLE;
+                    }
+
+                    seatList.add(new Seat(seatName, seatStatus));
+                }
+
+                // Set up adapter with updated seat list
+                SeatListAdapter seatAdapter = new SeatListAdapter(seatList, this, new SeatListAdapter.SelectedSeat() {
+                    @Override
+                    public void Return(ArrayList<String> selectedName, int num) {
+                        binding.numberSelectedTxt.setText(num + " Seat Selected");
+                        selectedSeats = selectedName;
+
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        price = Double.parseDouble(df.format(num * film.getPrice()));
+                        binding.priceTxt.setText("$ " + price);
+                        number = num;
+
+                        // Update Firebase with selected seats
+                        for (String seat : selectedName) {
+                            seatsRef.child(seat).setValue("TAKEN");
+                        }
+                    }
+                });
+
+                binding.seatRecyclerview.setAdapter(seatAdapter);
             } else {
-                seatStatus = Seat.SeatStatus.AVAILABLE;
-            }
-
-            // Create a new seat and add it to the list
-            seatList.add(new Seat(seatName, seatStatus));
-        }
-
-        // Create and set the SeatListAdapter with a custom implementation of SelectedSeat
-        SeatListAdapter seatAdapter = new SeatListAdapter(seatList, this, new SeatListAdapter.SelectedSeat() {
-            @Override
-            public void Return(ArrayList<String> selectedName, int num) {
-                // Update the number of selected seats
-                binding.numberSelectedTxt.setText(num + " Seat Selected");
-
-                selectedSeats = selectedName;
-
-                // Format the price
-                DecimalFormat df = new DecimalFormat("#.##");
-                price = Double.parseDouble(df.format(num * film.getPrice()));
-
-                // Update the price text
-                binding.priceTxt.setText("$ " + price);
-
-                // Update the number of selected seats
-                number = num;
+                Toast.makeText(this, "Failed to load seats", Toast.LENGTH_SHORT).show();
             }
         });
-
-        // Set the adapter for the RecyclerView
-        binding.seatRecyclerview.setAdapter(seatAdapter);
-        binding.seatRecyclerview.setNestedScrollingEnabled(false);
-
-        // Set layout manager and adapter for the time RecyclerView
-        binding.TimeRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-//        binding.TimeRecyclerview.setAdapter(new TimeAdapter(generateTimeSlots()));
-        binding.TimeRecyclerview.setAdapter(timeAdapter);
-
-
-        // Set layout manager and adapter for the date RecyclerView
-        binding.dateRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-//        binding.dateRecyclerview.setAdapter(new DateAdapter(generateDates()));
-        binding.dateRecyclerview.setAdapter(dateAdapter);
     }
+
+//    private void initSeatsList() {
+//        Log.d("SeatListActivity", "initSeatsList() called");
+//        // Set up time adapter with selection listener
+//        List<String> timeSlots = generateTimeSlots();
+//        TimeAdapter timeAdapter = new TimeAdapter(timeSlots, new TimeAdapter.OnTimeSelectedListener() {
+//
+//            @Override
+//            public void onTimeSelected(String time) {
+//                selectedTime = time;
+//                Log.d("SeatListActivity", "Selected Time: " + selectedTime);
+//            }
+//
+//        });
+//
+////        Log.d("ngaày nè", "check ngày đi: " + selectedDate);
+////        Log.d("giờ nè", "check giờ đi: " + selectedTime);
+//        binding.TimeRecyclerview.setLayoutManager(
+//                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+//        binding.TimeRecyclerview.setAdapter(timeAdapter);
+//
+//        // Set up date adapter with selection listener
+//        List<String> dates = generateDates();
+//        DateAdapter dateAdapter = new DateAdapter(dates, new DateAdapter.OnDateSelectedListener() {
+//            @Override
+//            public void onDateSelected(String date) {
+//                selectedDate = date;
+//                Log.d("SeatListActivity", "Selected Date: " + selectedDate);
+//            }
+//        });
+//
+//        binding.dateRecyclerview.setLayoutManager(
+//                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+//        binding.dateRecyclerview.setAdapter(dateAdapter);
+//
+//
+//        // Initialize the GridLayoutManager with 7 columns
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 7);
+//
+//        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                return 1; // Default to 1 span per item
+//            }
+//        });
+//
+//        // Set the LayoutManager for the RecyclerView
+//        binding.seatRecyclerview.setLayoutManager(gridLayoutManager);
+//
+//        // Initialize the seat list
+//        List<Seat> seatList = new ArrayList<>();
+//        int numberSeats = 81; // Example number of seats
+//
+//        // Loop through and create Seat objects
+//        for (int i = 0; i < numberSeats; i++) {
+//            String seatName = "Seat " + (i + 1); // Generate seat name
+//            Seat.SeatStatus seatStatus;
+//
+//            // Set specific seats as unavailable based on their index
+//            if (i == 2 || i == 20 || i == 33 || i == 41 || i == 50 || i == 72 || i == 73) {
+//                seatStatus = Seat.SeatStatus.UNAVAILABLE;
+//            } else {
+//                seatStatus = Seat.SeatStatus.AVAILABLE;
+//            }
+//
+//            // Create a new seat and add it to the list
+//            seatList.add(new Seat(seatName, seatStatus));
+//        }
+//
+//        // Create and set the SeatListAdapter with a custom implementation of SelectedSeat
+//        SeatListAdapter seatAdapter = new SeatListAdapter(seatList, this, new SeatListAdapter.SelectedSeat() {
+//            @Override
+//            public void Return(ArrayList<String> selectedName, int num) {
+//                // Update the number of selected seats
+//                binding.numberSelectedTxt.setText(num + " Seat Selected");
+//
+//                selectedSeats = selectedName;
+//
+//                // Format the price
+//                DecimalFormat df = new DecimalFormat("#.##");
+//                price = Double.parseDouble(df.format(num * film.getPrice()));
+//
+//                // Update the price text
+//                binding.priceTxt.setText("$ " + price);
+//
+//                // Update the number of selected seats
+//                number = num;
+//            }
+//        });
+//
+//        // Set the adapter for the RecyclerView
+//        binding.seatRecyclerview.setAdapter(seatAdapter);
+//        binding.seatRecyclerview.setNestedScrollingEnabled(false);
+//
+//        // Set layout manager and adapter for the time RecyclerView
+//        binding.TimeRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+////        binding.TimeRecyclerview.setAdapter(new TimeAdapter(generateTimeSlots()));
+//        binding.TimeRecyclerview.setAdapter(timeAdapter);
+//
+//
+//        // Set layout manager and adapter for the date RecyclerView
+//        binding.dateRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+////        binding.dateRecyclerview.setAdapter(new DateAdapter(generateDates()));
+//        binding.dateRecyclerview.setAdapter(dateAdapter);
+//    }
 
     private void setVariables() {
         binding.backBtn.setOnClickListener(v -> finish());
